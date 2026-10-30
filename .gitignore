@@ -39,7 +39,8 @@ dist/
 *.jks
 *.keystore
 
-# macOS and editor-local files
+# macOS, Windows and editor-local files
+Thumbs.db
 .DS_Store
 .AppleDouble
 .LSOverride
@@ -64,7 +65,12 @@ node_modules/
 # Temporary databases, logs, and test output
 *.sqlite
 *.sqlite3
+*.db
+*.db-wal
+*.db-shm
 *.db-journal
+*.sqlite-wal
+*.sqlite-shm
 *.log
 *.tmp
 *.temp
@@ -85,6 +91,7 @@ avrl-evidence/
 avrl-tmp/
 *.evidence.tmp
 *.signing-key
+.vorqa-source-migration.lock
 
 # Claude Code machine-local settings
 .claude/settings.local.json
