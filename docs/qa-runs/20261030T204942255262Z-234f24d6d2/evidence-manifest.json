@@ -1,4 +1,11 @@
 {
+  "ci_artifact": {
+    "artifact_id": 13010299766,
+    "expires_at": "2026-11-06T20:54:15Z",
+    "name": "vorqa-observability-pilot",
+    "sha256": "1f935e4a98ead5c758dddda63b96e7deec231b25daffa140ac47166a60c96e61",
+    "url": "https://github.com/Centaurioun/VORQA/actions/runs/41126724426/artifacts/13010299766"
+  },
   "excluded_artifacts": [
     {
       "location_category": ".avrl/qa-runs/<run-id>/logs/ (ignored local runtime)",
@@ -39,9 +46,9 @@
   ],
   "published_files": [
     {
-      "bytes": 2495,
+      "bytes": 3030,
       "path": "README.md",
-      "sha256": "7fde53249b540890b4022fa6f900185fe0badb136915b36405bdbb54bb8883aa"
+      "sha256": "929abe1a5cb76d0e4e207e8ce392c8155c8be9999b770f562484f29b47cd3a3d"
     },
     {
       "bytes": 1289,
@@ -54,19 +61,19 @@
       "sha256": "6da7f12ad038cba057223b26cdb5451956e6b51e44d0fa71e663f1e4197b4b3b"
     },
     {
-      "bytes": 1936,
+      "bytes": 2361,
       "path": "coverage.json",
-      "sha256": "3a0e7b55895ffd1c3e1661254210a6bbda33e4276753a94eeaa33f4bbe6adf00"
+      "sha256": "8073e5a44155a1d4e9878ba549d04d677a13db7f77e1ae0b9458853ac2cac1ac"
     },
     {
-      "bytes": 1232,
+      "bytes": 1228,
       "path": "environment.md",
-      "sha256": "0c554cb591d424328f9652485e8c4b1c8061fb2b444ca2ad0e93506bcfdec7bf"
+      "sha256": "b74c505489d31b84afb16d49a04ed34bedb61992d779bf42649554a34d4e90f3"
     },
     {
-      "bytes": 2065,
+      "bytes": 2190,
       "path": "failures.md",
-      "sha256": "da84ca0903f7daf081d4282b264e14243f98ad93610ddac1e2da5006426e6962"
+      "sha256": "7da58baa05d95aae4688294a62209b3fdbb43a9e1023606526ec6fd777f588f8"
     },
     {
       "bytes": 4447,
@@ -79,9 +86,9 @@
       "sha256": "a0495d15c8c378834513385133c6f04404e1dd3909adad851916c08b71967a81"
     },
     {
-      "bytes": 16978,
+      "bytes": 17236,
       "path": "sanitized-results.json",
-      "sha256": "112254c2a20926ef7ae7ed8169e351cbda0f8daeb62db0dd444ef4ece4b67874"
+      "sha256": "883626357a7ca99cb07762bb6c51701d7991322edb6b88411ff2234306d6dacb"
     },
     {
       "bytes": 7637,

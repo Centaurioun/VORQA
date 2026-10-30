@@ -13,7 +13,17 @@
     "origin": "local-process"
   },
   "git_sha": "234f24d6d2a7ab08852c633234abd10d551772c3",
-  "github_actions": "pending PR creation",
+  "github_actions": {
+    "artifact_expires_at": "2026-11-06T20:54:15Z",
+    "artifact_id": 13010299766,
+    "artifact_name": "vorqa-observability-pilot",
+    "artifact_url": "https://github.com/Centaurioun/VORQA/actions/runs/41126724426/artifacts/13010299766",
+    "claude_candidate_conclusion": "success",
+    "claude_candidate_run_id": 41126724426,
+    "claude_candidate_steps": 10,
+    "foundation_conclusion": "success",
+    "foundation_run_id": 41126724273
+  },
   "hook_configuration_validation": {
     "configured_command_entries": 13,
     "event_groups": 12,

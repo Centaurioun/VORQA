@@ -14,6 +14,6 @@ The first sandboxed attempt could not bind loopback sockets, access Chromium’s
 - Native event delivery, including permission UI outcomes, remains unobserved. The synthetic `PermissionDenied` payload models the documented auto-mode event and does not represent a user pressing Reject.
 - Review and operator identities in both lifecycle runs are synthetic fixtures, not independent human approvals.
 - Browser diagnostics capture console errors, runtime exceptions, failed requests, external requests, and HTTP 5xx. The tested routes returned expected 200/201 responses; broader response-status taxonomy and accessibility/screen-reader automation were outside these scenarios.
-- GitHub Actions results are to be attached after the PR workflow completes.
+- GitHub Actions run #41126724426 completed successfully (all 10 Claude candidate job steps); Foundation checks run #41126724273 also passed. The sanitized artifact was uploaded and expires 2026-11-06.
 
 No product-code defect was confirmed by the final campaign.
