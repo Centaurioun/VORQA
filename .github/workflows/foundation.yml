@@ -22,5 +22,5 @@ jobs:
         run: python3 -m unittest discover -s tests -p 'test_source_organizer.py' -v
       - name: Check GitHub review-policy decision tests
         run: python3 -m unittest discover -s tests -p 'test_github_review_policy.py' -v
-      - name: Compile source organizer
-        run: python3 -m py_compile scripts/organize_claude_sources.py
+      - name: Compile repository governance helpers
+        run: python3 -m py_compile scripts/organize_claude_sources.py scripts/github_review_policy.py
