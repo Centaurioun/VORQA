@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import ipaddress
 import datetime as dt
 import fcntl
 import hashlib
@@ -21,6 +22,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME = ROOT / '.avrl'
@@ -233,7 +235,8 @@ def cmd_init(args):
                  'eval_digest':eval_files(slug), 'approval_digest':None, 'checks':checks,
                  'events':[], 'reason':'Human sign-off required', 'last_finding_signature':None,
                  'repeat_count':0, 'round_commits':[], 'findings':[], 'review_pass':False,
-                 'blind_qa_pass':False,'authorized_rethink':False}
+                 'blind_qa_pass':False,'review_evidence':None,'blind_evidence':None, 'verification_nonce':None,
+                 'authorized_rethink':False}
         save(slug, state, 'initialized; awaiting human approval')
         atomic(RUNTIME / 'active.json', json_bytes({'feature':slug}))
         print('Initialized', slug, state['eval_digest'][:12])
@@ -291,6 +294,8 @@ def cmd_round(args):
         assert_clean()
         s['round']+=1
         s['status']='building'; s['review_pass']=False; s['blind_qa_pass']=False
+        s['review_evidence']=None; s['blind_evidence']=None
+        s['verification_nonce']=None
         s['checks']={x['id']:{'status':'PENDING'} for x in criteria(args.feature)}
         s['reason']=None
         s['round_commits'].append({'round':s['round'],'base':git('rev-parse','HEAD')})
@@ -305,6 +310,9 @@ def cmd_verify(args):
         if not approval_valid(args.feature,s): raise ValueError('Eval approval invalid')
         assert_git_branch(args.feature); assert_clean()
         s['status']='verifying'
+        s['review_pass']=False; s['blind_qa_pass']=False
+        s['review_evidence']=None; s['blind_evidence']=None
+        s['verification_nonce']=secrets.token_hex(16)
         commit=git('rev-parse','HEAD')
         results={}
         for entry in criteria(args.feature):
@@ -338,6 +346,116 @@ def cmd_verify(args):
         if any(v['status']!='PASS' for v in results.values()): sys.exit(1)
 
 
+def review_report(slug, state, commit, raw_path):
+    """Validate a bounded, commit-bound review report; identity is NOT attested."""
+    nonce = state.get('verification_nonce')
+    if not isinstance(nonce, str) or not re.fullmatch(r'[0-9a-f]{32}', nonce):
+        raise ValueError('A fresh verifier run is required before review')
+    if not raw_path:
+        raise ValueError('Review PASS requires --evidence <review.json>')
+    path = (ROOT / raw_path).resolve()
+    allowed = (RUNTIME / 'review' / slug).resolve()
+    if not path.is_relative_to(allowed) or path.suffix != '.json' or not path.is_file():
+        raise ValueError('Review evidence must be JSON in .avrl/review/<slug>/')
+    report = json.loads(path.read_text())
+    if not isinstance(report, dict):
+        raise ValueError('Review report must be a JSON object')
+    expected = {'schema_version': 1, 'feature': slug, 'commit': commit,
+                'eval_digest': state['eval_digest'], 'round': state['round'],
+                'verification_nonce': state.get('verification_nonce'),
+                'verdict': 'pass', 'findings': []}
+    if any(report.get(key) != value for key, value in expected.items()):
+        raise ValueError('Review report is stale, failed, or belongs to a different contract')
+    for key in ('reviewer', 'summary'):
+        if not isinstance(report.get(key), str) or not report[key].strip():
+            raise ValueError('Review report requires nonempty reviewer and summary')
+    files = report.get('reviewed_files')
+    if not isinstance(files, list) or not files or not all(isinstance(f, str) and f.strip() for f in files):
+        raise ValueError('Review report requires reviewed_files')
+    return {'evidence': str(path.relative_to(ROOT)), 'sha256': digest(path.read_bytes())}
+
+
+def review_evidence_valid(slug, state, commit):
+    try:
+        receipt = state.get('review_evidence')
+        if not isinstance(receipt, dict):
+            return False
+        verified = review_report(slug, state, commit, receipt.get('evidence'))
+        return hmac.compare_digest(verified['sha256'], receipt.get('sha256', ''))
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return False
+
+
+def blind_session_receipt(slug, state, commit, raw_path):
+    """Bind a QA event sequence and every screenshot to feature, round, and SHA."""
+    nonce = state.get('verification_nonce')
+    if not isinstance(nonce, str) or not re.fullmatch(r'[0-9a-f]{32}', nonce):
+        raise ValueError('Blind QA requires a fresh verification nonce')
+    if not raw_path:
+        raise ValueError('Blind QA PASS requires screenshot evidence')
+    directory = (RUNTIME / 'blind').resolve()
+    screenshot = (ROOT / raw_path).resolve()
+    if not screenshot.is_relative_to(directory) or screenshot.suffix != '.png' or not screenshot.is_file():
+        raise ValueError('Blind QA screenshot must be in .avrl/blind')
+    event_file = directory / 'events.jsonl'
+    records = [json.loads(line) for line in event_file.read_text().splitlines() if line.strip()]
+    if len(records) < 3:
+        raise ValueError('Blind QA requires at least three recorded browser interactions')
+    if not all(isinstance(record, dict) for record in records):
+        raise ValueError('Browser event must be a JSON object')
+    if not any(r.get('command') in {'open', 'fill', 'click', 'select', 'fill-label',
+                                   'click-role', 'select-label'} for r in records):
+        raise ValueError('Blind QA requires a user interaction, not screenshots alone')
+    captures = set()
+    first_origin = None
+    for entry in records:
+        if not isinstance(entry, dict):
+            raise ValueError('Invalid browser event')
+        for key, expected in (('feature', slug), ('commit', commit),
+                              ('eval_digest', state['eval_digest']), ('round', state['round']),
+                              ('verification_nonce', state.get('verification_nonce'))):
+            if entry.get(key) != expected:
+                raise ValueError('Browser event is stale or from another feature/round')
+        endpoint = urlsplit(entry.get('url', ''))
+        try:
+            loopback = endpoint.hostname in {'localhost'} or ipaddress.ip_address(endpoint.hostname or '').is_loopback
+        except ValueError:
+            loopback = False
+        if endpoint.scheme != 'http' or not loopback or not endpoint.port:
+            raise ValueError('Browser event points outside an allowed loopback origin')
+        origin = (endpoint.scheme, endpoint.hostname, endpoint.port)
+        if first_origin is None:
+            first_origin = origin
+        elif origin != first_origin:
+            raise ValueError('Browser events switched origins')
+        path = (ROOT / entry.get('capture', '')).resolve()
+        if (not path.is_relative_to(directory) or not path.name.startswith('event-') or
+                path.suffix != '.png' or not path.is_file() or path in captures or
+                digest(path.read_bytes()) != entry.get('sha256')):
+            raise ValueError('Browser event screenshot missing, altered or duplicated')
+        captures.add(path)
+    last = (ROOT / records[-1]['capture']).resolve()
+    if screenshot != last and screenshot.name != 'last.png':
+        raise ValueError('QA evidence must identify the final event screenshot')
+    if digest(screenshot.read_bytes()) != records[-1]['sha256']:
+        raise ValueError('QA screenshot does not match final event')
+    return {'evidence': str(screenshot.relative_to(ROOT)),
+            'sha256': digest(screenshot.read_bytes()),
+            'events_sha256': digest(event_file.read_bytes())}
+
+
+def blind_evidence_valid(slug, state, commit):
+    try:
+        receipt = state.get('blind_evidence')
+        if not isinstance(receipt, dict):
+            return False
+        current = blind_session_receipt(slug, state, commit, receipt.get('evidence'))
+        return (hmac.compare_digest(receipt.get('sha256', ''), current['sha256']) and
+                hmac.compare_digest(receipt.get('events_sha256', ''), current['events_sha256']))
+    except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError):
+        return False
+
+
 def cmd_review(args):
     with locked(args.feature):
         s=load(args.feature)
@@ -357,8 +475,14 @@ def cmd_review(args):
             s['status']='rethink' if s['repeat_count']>=3 or s['round']>=3 else 'reviewing'
             s['reason']='Same defect persisted across two fixes' if s['repeat_count']>=3 else 'Fix entire defect class and re-verify'
             s['review_pass']=False
+            s['review_evidence']=None
+            s['blind_qa_pass']=False
+            s['blind_evidence']=None
         else:
+            s['review_evidence']=review_report(args.feature,s,current,args.evidence)
             s['review_pass']=True; s['reason']=None
+            s['blind_qa_pass']=False
+            s['blind_evidence']=None
         save(args.feature,s,'reviewer '+args.result + (' — '+args.finding_class if args.finding_class else ''))
         print('Reviewer recorded:',args.result,'status:',s['status'])
 
@@ -366,19 +490,22 @@ def cmd_review(args):
 def cmd_blind(args):
     with locked(args.feature):
         s=load(args.feature)
-        if not s['review_pass'] or s['status']!='reviewing': raise ValueError('Pass independent review first')
-        if args.result=='pass':
-            evidence=(ROOT/args.evidence).resolve()
-            permitted=(ROOT/'.avrl'/'blind').resolve()
-            if not evidence.is_relative_to(permitted) or evidence.suffix!='.png' or not evidence.is_file():
-                raise ValueError('Blind QA PASS requires a real screenshot in .avrl/blind')
-            events=permitted/'events.jsonl'
-            if not events.exists() or len(events.read_text().splitlines())<3:
-                raise ValueError('Blind QA requires at least three recorded browser interactions')
+        if not s['review_pass'] or s['status']!='reviewing':
+            raise ValueError('Pass independent review first')
+        assert_git_branch(args.feature)
+        assert_clean()
+        commit=git('rev-parse','HEAD')
+        if not review_evidence_valid(args.feature,s,commit):
+            raise ValueError('Reviewer report missing or tampered')
         if args.result=='fail':
-            s['blind_qa_pass']=False;s['status']='reviewing';s['reason']='Blind QA failed; address friction and reverify'
+            s['blind_qa_pass']=False
+            s['blind_evidence']=None
+            s['status']='reviewing'
+            s['reason']='Blind QA failed; address friction and reverify'
         else:
+            s['blind_evidence']=blind_session_receipt(args.feature,s,commit,args.evidence)
             s['blind_qa_pass']=True
+            s['reason']=None
         save(args.feature,s,'blind QA '+args.result+': '+args.evidence)
         print('Blind QA result:',args.result)
 
@@ -429,6 +556,8 @@ def final_evidence_valid(slug,s):
         if not s.get('review_pass') or not s.get('blind_qa_pass'):return False
         assert_git_branch(slug);assert_clean()
         commit=git('rev-parse','HEAD')
+        if not review_evidence_valid(slug,s,commit) or not blind_evidence_valid(slug,s,commit):
+            return False
         if not release_valid(slug,s,commit):return False
         expected_ids={x['id'] for x in criteria(slug)}
         if set(s['checks'])!=expected_ids:return False
@@ -494,7 +623,7 @@ def parser():
     sp=sub.add_parser('round');sp.add_argument('feature');sp.set_defaults(run=cmd_round)
     sp=sub.add_parser('authorize-rethink');sp.add_argument('feature');sp.add_argument('--reason',required=True);sp.set_defaults(run=cmd_authorize_rethink)
     sp=sub.add_parser('verify');sp.add_argument('feature');sp.set_defaults(run=cmd_verify)
-    sp=sub.add_parser('review');sp.add_argument('feature');sp.add_argument('--result',required=True,choices=['pass','fail']);sp.add_argument('--finding-class');sp.add_argument('--fingerprint');sp.set_defaults(run=cmd_review)
+    sp=sub.add_parser('review');sp.add_argument('feature');sp.add_argument('--result',required=True,choices=['pass','fail']);sp.add_argument('--evidence');sp.add_argument('--finding-class');sp.add_argument('--fingerprint');sp.set_defaults(run=cmd_review)
     sp=sub.add_parser('blind');sp.add_argument('feature');sp.add_argument('--result',required=True,choices=['pass','fail']);sp.add_argument('--evidence',required=True);sp.set_defaults(run=cmd_blind)
     sp=sub.add_parser('release-attest');sp.add_argument('feature');sp.add_argument('--actor',required=True);sp.set_defaults(run=cmd_release_attest)
     sp=sub.add_parser('complete');sp.add_argument('feature');sp.set_defaults(run=cmd_complete)

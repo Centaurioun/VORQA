@@ -53,17 +53,30 @@ python3 scripts/avrl.py round example-signup
 python3 scripts/avrl.py verify example-signup
 
 # 5. Independent review of actual diff/evidence, then black-box QA.
-python3 scripts/avrl.py review example-signup --result pass
+# Reviewer independently inspects diff and deterministic evidence, then writes a
+# structured JSON report to .avrl/review/example-signup/report.json.
+# See docs/REVIEW_QA_RECEIPTS.md for required fields.
+python3 scripts/avrl.py review example-signup --result pass \
+  --evidence .avrl/review/example-signup/report.json
 python3 scripts/demo_server.py 8765
 # In a second terminal or Claude Code session: /first-time-user example-signup
+# Start fresh to avoid reusing events from older verification rounds.
+python3 scripts/blind_browser.py reset
 # Use `python3 scripts/blind_browser.py` only against the seeded loopback demo.
+# Run at least three browser actions, including a real interaction; capture
+# the final event image printed as EVIDENCE by the browser CLI.
 # After checking the recorded browser evidence:
-python3 scripts/avrl.py blind example-signup --result pass --evidence .avrl/blind/last.png
+python3 scripts/avrl.py blind example-signup --result pass --evidence .avrl/blind/event-2.png
 # The release approver must attest the tested Git commit interactively.
 python3 scripts/avrl.py release-attest example-signup --actor "release-reviewer@example.test"
 python3 scripts/avrl.py complete example-signup
 python3 scripts/avrl.py status example-signup
 ```
+
+**The report and event paths above are illustrative; inspect actual output and
+use the most recent event screenshot.** Each verification run generates a new
+nonce, and review/QA artifacts must contain matching SHA, digest, round and
+nonce. See [review/QA evidence format](docs/REVIEW_QA_RECEIPTS.md).
 
 **The example commands are a runbook, not an assertion of success.** `verify` must fail if the current host cannot launch Chromium or open the local test service. Likewise, `review pass` may only be called after genuinely independent human/agent review. The example's existing app means no implementation is necessary for a happy-path run, but completing it still requires live browser and QA evidence.
 
