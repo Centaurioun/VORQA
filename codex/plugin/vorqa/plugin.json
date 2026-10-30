@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "vorqa",
-  "version": "0.1.0",
-  "description": "Developer preview of VORQA verification workflow discovery and read-only controller inspection for Codex.",
+  "version": "0.2.0-alpha.1",
+  "description": "Local developer preview of VORQA read-only controller inspection and trust-reviewed Codex hook feasibility.",
   "author": {
     "name": "VORQA contributors"
   },
@@ -11,7 +11,7 @@
       "interface": {
         "displayName": "VORQA for Codex",
         "shortDescription": "Evidence-aware code QA",
-        "longDescription": "Inspect a VORQA-initialized repository and guide evidence-aware verification workflows. Preview: no automatic installation, native hook enforcement, or completion certification.",
+        "longDescription": "Inspect trusted AVRL repositories using a read-only bridge. Experimental Codex hook handlers require native trust review and do not enforce release or QA completion.",
         "developerName": "VORQA",
         "category": "Productivity",
         "capabilities": [
