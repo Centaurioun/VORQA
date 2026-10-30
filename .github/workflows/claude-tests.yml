@@ -43,12 +43,16 @@ jobs:
 
       - name: End-to-end observability pilot (real HTTP, SQLite, Chromium, synthetic hook events)
         run: python scripts/observability_pilot.py --output .avrl/pilot/summary.json
+      - name: Full positive lifecycle (PTY fixture approvals and real Chromium QA)
+        run: python scripts/full_lifecycle_pilot.py --mode full --output .avrl/pilot/full-lifecycle.json
       - name: Upload redacted observability report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: vorqa-observability-pilot
-          path: claude/implementation/.avrl/pilot/summary.json
+          path: |
+            claude/implementation/.avrl/pilot/summary.json
+            claude/implementation/.avrl/pilot/full-lifecycle.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 7
