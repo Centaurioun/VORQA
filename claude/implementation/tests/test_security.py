@@ -38,7 +38,10 @@ class HookAdversarialTests(unittest.TestCase):
     def test_blind_browser_only_allow(self):
         for cmd in ['python3 scripts/blind_browser.py open /signup',
                     'python3 scripts/blind_browser.py fill "#email" "qa@example.test"',
-                    'python3 scripts/blind_browser.py screenshot']:
+                    'python3 scripts/blind_browser.py screenshot',
+                    'python3 scripts/blind_browser.py inspect',
+                    'python3 scripts/blind_browser.py fill-label "Email address" "qa@example.test"',
+                    'python3 scripts/blind_browser.py click-role button "Create account"']:
             with self.subTest(cmd=cmd):
                 result=hook('blind',{'agent_type':'blind-qa','tool_name':'Bash','tool_input':{'command':cmd}})
                 self.assertEqual(result.returncode,0,result.stderr)
