@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light"><title>Create Account — AVRL Demo</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#172434;background:#edf3f8}*{box-sizing:border-box}
+body{min-height:100vh;margin:0;display:grid;place-items:center;padding:24px}
+main{background:white;width:min(100%,430px);border:1px solid #dce5ed;border-radius:24px;padding:38px;box-shadow:0 18px 48px #243e5920}
+small{font-weight:700;letter-spacing:.13em;color:#3862a6}h1{margin:14px 0 10px;font-size:30px;letter-spacing:-.04em}p{margin:0 0 28px;color:#627080;line-height:1.5}
+label{display:block;font-weight:650;margin-top:19px}input{width:100%;margin-top:8px;padding:14px;border-radius:9px;border:1.5px solid #bdcad8;font:inherit}input:focus{outline:3px solid #bed3f9;outline-offset:1px}
+button{margin-top:25px;border:0;border-radius:10px;width:100%;padding:15px;font:inherit;font-weight:750;background:#214d94;color:white;cursor:pointer}
+button:focus-visible{outline:3px solid #83b3fb;outline-offset:3px}#response{margin-top:18px;margin-bottom:0;min-height:22px;font-weight:600}#response.error{color:#a92d35}#response.ok{color:#177247}
+@media(max-width:480px){body{padding:12px}main{padding:27px 22px;border-radius:16px}h1{font-size:27px}}
+</style></head>
+<body><main><small>WELCOME</small><h1>Create your account</h1><p>Start with a name and email address.</p>
+<form id="signup" novalidate><label for="name">Full name</label><input value="Taylor Example" id="name" name="name" autocomplete="name" required maxlength="80">
+<label for="email">Email address</label><input value="not-an-email" id="email" name="email" type="email" autocomplete="email" required maxlength="254">
+<button id="create" type="submit">Create account</button></form><p id="response" class="error" role="status" aria-live="polite">Enter a valid name and email</p></main>
+<script>
+const form=document.querySelector('#signup');const result=document.querySelector('#response');
+form.addEventListener('submit',async e=>{e.preventDefault();result.className='';const name=document.querySelector('#name').value.trim();const email=document.querySelector('#email').value.trim();
+if(!name||!email||!/^\S+@\S+\.\S+$/.test(email)){result.className='error';result.textContent='Enter a valid name and email';return;}
+try{const response=await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email})});const payload=await response.json();
+result.className=response.ok?'ok':'error';result.textContent=payload.message||payload.error||'Unexpected response';}
+catch{result.className='error';result.textContent='Could not connect. Try again.';}});
+</script></body></html>

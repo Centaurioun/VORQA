@@ -1,0 +1,48 @@
+{
+  "base_url": "http://127.0.0.1:8765",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "server": {
+    "argv": [
+      "python3",
+      "scripts/demo_server.py",
+      "8765"
+    ]
+  },
+  "actions": [
+    {
+      "goto": "/signup"
+    },
+    {
+      "expect_role": {
+        "role": "heading",
+        "name": "Create your account"
+      }
+    },
+    {
+      "compare_mockup": {
+        "filename": "desktop.png",
+        "max_mean_error": 0.045
+      }
+    },
+    {
+      "fill": "#name",
+      "value": "Test Person"
+    },
+    {
+      "fill": "#email",
+      "value": "unique@example.test"
+    },
+    {
+      "click": "#create"
+    },
+    {
+      "expect_text": "Account created"
+    },
+    {
+      "screenshot": "desktop-success"
+    }
+  ]
+}

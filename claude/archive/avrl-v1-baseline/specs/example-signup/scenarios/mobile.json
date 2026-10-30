@@ -1,0 +1,42 @@
+{
+  "base_url": "http://127.0.0.1:8766",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "server": {
+    "argv": [
+      "python3",
+      "scripts/demo_server.py",
+      "8766"
+    ]
+  },
+  "actions": [
+    {
+      "goto": "/signup"
+    },
+    {
+      "compare_mockup": {
+        "filename": "mobile.png",
+        "max_mean_error": 0.045
+      }
+    },
+    {
+      "fill": "#name",
+      "value": "Mobile Person"
+    },
+    {
+      "fill": "#email",
+      "value": "m@example.test"
+    },
+    {
+      "click": "#create"
+    },
+    {
+      "expect_text": "Account created"
+    },
+    {
+      "screenshot": "mobile-success"
+    }
+  ]
+}

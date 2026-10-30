@@ -1,0 +1,42 @@
+{
+  "base_url": "http://127.0.0.1:8767",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "server": {
+    "argv": [
+      "python3",
+      "scripts/demo_server.py",
+      "8767"
+    ]
+  },
+  "actions": [
+    {
+      "goto": "/signup"
+    },
+    {
+      "fill": "#name",
+      "value": "Taylor Example"
+    },
+    {
+      "fill": "#email",
+      "value": "not-an-email"
+    },
+    {
+      "click": "#create"
+    },
+    {
+      "expect_text": "Enter a valid name and email"
+    },
+    {
+      "compare_mockup": {
+        "filename": "edge.png",
+        "max_mean_error": 0.045
+      }
+    },
+    {
+      "screenshot": "error-feedback"
+    }
+  ]
+}

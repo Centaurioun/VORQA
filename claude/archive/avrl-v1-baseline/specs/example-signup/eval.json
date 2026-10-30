@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "criteria": [
+    {
+      "id": "UNIT",
+      "type": "command",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_demo.py"
+      ],
+      "timeout": 45
+    },
+    {
+      "id": "BROWSER_DESKTOP",
+      "type": "browser",
+      "scenario": "desktop.json"
+    },
+    {
+      "id": "BROWSER_MOBILE",
+      "type": "browser",
+      "scenario": "mobile.json"
+    },
+    {
+      "id": "VISUAL_ERROR",
+      "type": "visual",
+      "scenario": "edge.json"
+    }
+  ]
+}
