@@ -92,7 +92,8 @@ class PackageManifestTests(unittest.TestCase):
         self.assertEqual(portable["name"], "vorqa")
         self.assertEqual(legacy["skills"], "./skills/")
         self.assertLessEqual(len(portable["extensions"]["com.openai"]["interface"]["shortDescription"]), 30)
-        self.assertFalse((root / "hooks").exists())
+        self.assertTrue((root / "hooks/hooks.json").is_file())
+        self.assertEqual(portable["version"], "0.2.0-alpha.1")
         self.assertFalse((root / "mcp.json").exists())
 
     def test_skill_discovery_and_explicit_negative_examples(self):
