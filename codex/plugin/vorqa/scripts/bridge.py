@@ -13,7 +13,7 @@ import re
 import subprocess
 import sys
 
-SLUG = re.compile(r"[a-z][a-z0-9-]{1,48}\\Z")
+SLUG = re.compile(r"[a-z][a-z0-9-]{1,48}\Z")
 TIMEOUT = 12
 STATUSES = frozenset({"draft", "in-review", "awaiting-approval", "approved", "building", "verifying", "reviewing", "rethink", "paused", "failed", "completed"})
 RISKS = frozenset({"low", "medium", "high"})
