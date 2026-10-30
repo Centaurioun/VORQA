@@ -1,0 +1,91 @@
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+virtualenv/
+
+# Python bytecode, caches, and build output
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Local environment files and secrets (keep example templates)
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.jks
+*.keystore
+
+# macOS and editor-local files
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node.js adapters and caches
+node_modules/
+.npm/
+.pnpm-store/
+.yarn/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+.cache/
+
+# Temporary databases, logs, and test output
+*.sqlite
+*.sqlite3
+*.db-journal
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Playwright output
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# AVRL local runtime state, temporary evidence, and signing material
+.avrl/
+avrl-runtime/
+avrl-state/
+avrl-evidence/
+avrl-tmp/
+*.evidence.tmp
+*.signing-key
+
+# Claude Code machine-local settings
+.claude/settings.local.json
+claude/.claude/settings.local.json
