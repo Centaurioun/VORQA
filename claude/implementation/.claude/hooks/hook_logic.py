@@ -149,7 +149,9 @@ def main():
         state=active()
         hook_event=event.get('hook_event_name')
         decision=('blocked' if result==2 else
-                  'observed_failure' if hook_event=='PostToolUseFailure' else
+                  'observed_failure' if hook_event in ('PostToolUseFailure','StopFailure') else
+                  'observed_request' if hook_event=='PermissionRequest' else
+                  'observed_denial' if hook_event=='PermissionDenied' else
                   'observed_success' if hook_event=='PostToolUse' else
                   'allowed' if result==0 else 'error')
         path=Path(os.environ.get('VORQA_TRACE_FILE',str(RUNTIME/'trace.jsonl')))
