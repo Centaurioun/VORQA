@@ -27,6 +27,7 @@ EXPECTED = [
     {'kind':'hook','event':'TaskCompleted','decision':'blocked','origin':'synthetic'},
     {'kind':'hook','event':'Stop','decision':'allowed','origin':'synthetic'},
     {'kind':'hook','event':'PostToolUseFailure','decision':'observed_failure','origin':'synthetic'},
+    {'kind':'hook','event':'PostToolUse','decision':'observed_success','origin':'synthetic'},
     {'kind':'hook','event':'SessionStart','origin':'synthetic'},
     {'kind':'hook','event':'SubagentStart','origin':'synthetic'},
     {'kind':'hook','event':'SubagentStop','origin':'synthetic'},
@@ -114,6 +115,7 @@ def pilot(*,include_browser: bool) -> dict:
             'tool_input':{'file_path':str(repo/'example_app/index.html'),'content':'SENSITIVE_FIXTURE_MARKER'}})
         send('task_completed','completion',{'hook_event_name':'TaskCompleted'})
         send('in_review_stop','completion',{'hook_event_name':'Stop','stop_hook_active':False})
+        send('successful_tool','audit',{'hook_event_name':'PostToolUse','tool_name':'Read'})
         send('failed_tool','audit',{'hook_event_name':'PostToolUseFailure','tool_name':'Bash',
                                    'tool_input':{'command':'SENSITIVE_FIXTURE_MARKER'}})
         send('session_start','audit',{'hook_event_name':'SessionStart','source':'startup'})
@@ -137,7 +139,7 @@ def pilot(*,include_browser: bool) -> dict:
         success=(steps['init']['exit']==0 and steps['preapproval_write']['exit']==2 and
                  steps['task_completed']['exit']==2 and steps['paused_stop']['exit']==0 and
                  steps['verify_without_approval']['exit']!=0 and steps['pause']['exit']==0 and
-                 all(steps[k]['exit']==0 for k in ('failed_tool','session_start','subagent_start','subagent_stop')))
+                 all(steps[k]['exit']==0 for k in ('successful_tool','failed_tool','session_start','subagent_start','subagent_stop')))
         return {'kind':'synthetic_hook_dispatch_real_git_controller',
                 'native_claude_verified':False,'steps':steps,'coverage':matrix,
                 'browser':browser,'api':api,
