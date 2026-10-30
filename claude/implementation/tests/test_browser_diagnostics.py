@@ -42,5 +42,51 @@ class BrowserDiagnosticsTests(unittest.TestCase):
         self.assertNotIn('private', repr(summary))
 
 
+class BrowserFailureEvidenceTests(unittest.TestCase):
+    """A failed scenario must still leave inspectable diagnostic metadata."""
+
+    def test_invalid_action_writes_diagnostic_and_step_index(self):
+        import json
+        import tempfile
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            scenario = root / 'invalid-action.json'
+            scenario.write_text(json.dumps({
+                'base_url': 'http://127.0.0.1:8765',
+                'actions': [{'unsupported_action': 'do not publish this input'}],
+            }))
+            with patch.object(browser_checks, 'ROOT', root):
+                with self.assertRaisesRegex(ValueError, 'Unknown browser action'):
+                    browser_checks.run_scenario(scenario, 'failure-fixture')
+            diagnostic = root / '.avrl/browser-evidence/failure-fixture/diagnostics-invalid-action.json'
+            self.assertTrue(diagnostic.is_file(), 'No diagnostic written when scenario failed')
+            data = json.loads(diagnostic.read_text())
+            self.assertEqual(data['execution_failure']['category'], 'ValueError')
+            self.assertEqual(data['execution_failure']['step_index'], 0)
+            self.assertNotIn('do not publish this input', diagnostic.read_text())
+
+    def test_browser_start_failure_writes_safe_diagnostic(self):
+        import json
+        import tempfile
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            scenario = root / 'startup.json'
+            scenario.write_text(json.dumps({
+                'base_url': 'http://127.0.0.1:8765', 'actions': [],
+            }))
+            with patch.object(browser_checks, 'ROOT', root):
+                with patch('browser_runtime.launch_chromium',
+                           side_effect=RuntimeError('SECRET_MARKER browser launch error')):
+                    with self.assertRaisesRegex(RuntimeError, 'SECRET_MARKER'):
+                        browser_checks.run_scenario(scenario, 'failure-fixture')
+            diagnostic = root / '.avrl/browser-evidence/failure-fixture/diagnostics-startup.json'
+            self.assertTrue(diagnostic.is_file(), 'No diagnostic written when browser launch failed')
+            data = json.loads(diagnostic.read_text())
+            self.assertEqual(data['execution_failure']['category'], 'RuntimeError')
+            self.assertIsNone(data['execution_failure']['step_index'])
+            self.assertNotIn('SECRET_MARKER', diagnostic.read_text())
+
 if __name__ == '__main__':
     unittest.main()
