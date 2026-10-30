@@ -96,6 +96,8 @@ def run_scenario(path,feature):
                     if urlsplit(page.url).netloc!=urlsplit(base).netloc:raise ValueError('Cross-origin redirect blocked')
                 elif 'fill' in step:page.locator(step['fill']).fill(step['value'])
                 elif 'click' in step:page.locator(step['click']).click()
+                elif 'press' in step:
+                    page.locator(step['press']['selector']).press(step['press']['key'])
                 elif 'expect_text' in step:page.get_by_text(step['expect_text'],exact=False).first.wait_for(state='visible',timeout=6000)
                 elif 'expect_role' in step:
                     role=step['expect_role'];page.get_by_role(role['role'],name=role['name']).wait_for(state='visible',timeout=6000)
