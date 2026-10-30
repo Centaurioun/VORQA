@@ -101,7 +101,8 @@ class TraceSettingsTests(unittest.TestCase):
     def test_config_registers_lifecycle_and_failure_events(self):
         data=json.loads((ROOT/'.claude/settings.json').read_text())['hooks']
         for name in ('PreToolUse','PostToolUse','PostToolUseFailure','SessionStart',
-                     'SubagentStart','SubagentStop','Stop','TaskCompleted'):
+                     'SubagentStart','SubagentStop','Stop','TaskCompleted',
+                     'PermissionRequest','PermissionDenied','SessionEnd','StopFailure'):
             with self.subTest(event=name):
                 self.assertIn(name,data)
                 self.assertTrue(data[name])
