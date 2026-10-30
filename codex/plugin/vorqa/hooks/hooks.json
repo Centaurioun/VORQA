@@ -1,0 +1,28 @@
+{
+  "description": "VORQA local pilot: read-only prompt context; Stop continuation only with fixture opt-in.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/dispatcher.py\"",
+            "timeout": 8,
+            "additionalContextLimit": 500
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/dispatcher.py\"",
+            "timeout": 8
+          }
+        ]
+      }
+    ]
+  }
+}
