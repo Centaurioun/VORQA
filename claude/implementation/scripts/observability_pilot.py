@@ -31,6 +31,10 @@ EXPECTED = [
     {'kind':'hook','event':'SessionStart','origin':'synthetic'},
     {'kind':'hook','event':'SubagentStart','origin':'synthetic'},
     {'kind':'hook','event':'SubagentStop','origin':'synthetic'},
+    {'kind':'hook','event':'PermissionRequest','decision':'observed_request','origin':'synthetic'},
+    {'kind':'hook','event':'PermissionDenied','decision':'observed_denial','origin':'synthetic'},
+    {'kind':'hook','event':'StopFailure','decision':'observed_failure','origin':'synthetic'},
+    {'kind':'hook','event':'SessionEnd','origin':'synthetic'},
 ]
 
 
@@ -121,6 +125,10 @@ def pilot(*,include_browser: bool) -> dict:
         send('session_start','audit',{'hook_event_name':'SessionStart','source':'startup'})
         send('subagent_start','audit',{'hook_event_name':'SubagentStart','agent_type':'builder'})
         send('subagent_stop','audit',{'hook_event_name':'SubagentStop','agent_type':'builder'})
+        send('permission_request','audit',{'hook_event_name':'PermissionRequest'})
+        send('permission_denied','audit',{'hook_event_name':'PermissionDenied'})
+        send('stop_failure','audit',{'hook_event_name':'StopFailure'})
+        send('session_end','audit',{'hook_event_name':'SessionEnd'})
         record('pause',call(repo,controller+['pause','example-signup','--kind','paused',
                                            '--reason','human review needed']))
         send('paused_stop','completion',{'hook_event_name':'Stop','stop_hook_active':False})
@@ -139,7 +147,8 @@ def pilot(*,include_browser: bool) -> dict:
         success=(steps['init']['exit']==0 and steps['preapproval_write']['exit']==2 and
                  steps['task_completed']['exit']==2 and steps['paused_stop']['exit']==0 and
                  steps['verify_without_approval']['exit']!=0 and steps['pause']['exit']==0 and
-                 all(steps[k]['exit']==0 for k in ('successful_tool','failed_tool','session_start','subagent_start','subagent_stop')))
+                 all(steps[k]['exit']==0 for k in ('successful_tool','failed_tool','session_start','subagent_start','subagent_stop',
+                     'permission_request','permission_denied','stop_failure','session_end')))
         return {'kind':'synthetic_hook_dispatch_real_git_controller',
                 'native_claude_verified':False,'steps':steps,'coverage':matrix,
                 'browser':browser,'api':api,
