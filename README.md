@@ -4,13 +4,13 @@
 
 VORQA is an evidence-oriented, cross-platform autonomous verification and code-review framework. Its goal is a **single auditable core** with separate Claude Code, Codex, Antigravity and GitHub Copilot adapters.
 
-> **Status: repository foundation.** The AVRL v2 implementation and historic reference files are still on the maintainer's Mac under an **untracked** `claude/` directory. They have NOT been published or validated by this repository. Do not treat this skeleton as a production-certified tool.
+> **Status: repository foundation.** The source import (PR #2) published the reviewed AVRL v1/v2 implementation snapshots under `claude/`. The Claude Code candidate is being hardened in Phase 1. No native Claude Code host verification or production certification has been completed.
 
 ## Platform layout
 
 | Directory | Scope | Status |
 | --- | --- | --- |
-| [claude/](claude/OVERVIEW.md) | Claude Code candidate implementation and source curation | First priority; historical code is local |
+| [claude/](claude/OVERVIEW.md) | Claude Code implementation, archived baseline and curated references | Phase 1 hardening in progress |
 | [codex/](codex/README.md) | OpenAI Codex skill/plugin adapter | Reserved |
 | [antigravity/](antigravity/README.md) | Google Antigravity skills/rules adapter | Reserved |
 | [copilot/](copilot/README.md) | GitHub Copilot integration | Reserved |
@@ -23,14 +23,14 @@ An agent's claim that work is complete is not proof of completion. VORQA aims to
 
 ## Initial local migration
 
-After pulling the foundation files, keep your existing untracked `claude/` sources in place:
+For historical reference, the original local import used this source-organizer process (already completed in PR #2):
 
 ```bash
 git pull --ff-only origin main
 python3 scripts/organize_claude_sources.py --dry-run
 ```
 
-If the proposed source/destination mapping is correct, run the script again with `--apply`. It never stages, commits, pushes, uploads or edits file contents. See [migration instructions](docs/LOCAL_MIGRATION.md).
+Do **not** re-run `--apply` on already migrated folders. The organizer remains available for legacy imports; see [migration instructions](docs/LOCAL_MIGRATION.md).
 
 ## Roadmap and rules
 
