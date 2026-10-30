@@ -25,5 +25,8 @@ class FullLifecycleTests(unittest.TestCase):
             self.assertTrue(report['guards']['tampered_review_denied'])
             self.assertEqual(report['coverage']['expected'],8)
             self.assertEqual(report['coverage']['observed'],8)
+            self.assertEqual(len(report['controller_state_events']),8)
+            self.assertEqual(report['controller_state_events'][0]['from_status'],'none')
+            self.assertEqual(report['controller_state_events'][-1]['to_status'],'completed')
 
 if __name__=='__main__': unittest.main()
