@@ -120,3 +120,15 @@ Stop hooks permit intentional pauses; `TaskCompleted` refuses marking unfinished
 The local approval HMAC protects against accidental drift, not against an agent/process with access to the operator's home account and the signing key. Review assertions and blind-QA reports cannot be made independent by a self-reporting CLI. Claude Code tool hooks do not intercept OS processes outside Claude or all novel exfiltration vectors. Use OS-level browser sandboxing, protected CI and branch rules to make these meaningful trust boundaries.
 
 The sample server and SQLite database are **test fixtures**, not a production identity service. Its signup does not implement real authentication, email verification, password storage, rate limiting or deployment. Browser tests require a browser that the host security policy actually permits to navigate to loopback; the harness must not silently fall back to a weaker test if that is prohibited.
+
+## Runtime observability and real-scenario pilot
+
+AVRL now records metadata-only hook outcomes and state transitions to the Git-ignored `.avrl/trace.jsonl`. It does **not** capture full prompts, tool input, secrets or internal chain-of-thought. Hook replay in the pilot is synthetic; actual Claude Code host dispatch is a separate acceptance step.
+
+```sh
+python3 scripts/observability_pilot.py --no-browser --output .avrl/pilot/summary.json
+# Run without --no-browser when Chromium loopback navigation is permitted:
+python3 scripts/observability_pilot.py --output .avrl/pilot/summary.json
+```
+
+The pilot exercises real Git commands, AVRL state gates, the seeded HTTP API (201/409/400), SQLite persistence and optionally Playwright desktop/mobile/edge tests. The report distinguishes observed events, absent events and **native Claude Code: UNVERIFIED**. See [observability pilot runbook](docs/OBSERVABILITY_PILOT.md).
