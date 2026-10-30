@@ -11,7 +11,7 @@ from pathlib import Path
 import re
 
 FIELDS = {'kind', 'event', 'handler', 'decision', 'reason', 'feature',
-          'tool_name', 'origin', 'from_status', 'to_status', 'action',
+          'tool_name', 'agent_type', 'origin', 'from_status', 'to_status', 'action',
           'criterion', 'outcome', 'git_sha', 'eval_digest', 'round'}
 IDENTIFIER = re.compile(r'^[a-zA-Z0-9_.:-]{1,70}$')
 
