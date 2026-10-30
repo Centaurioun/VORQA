@@ -129,10 +129,28 @@ def save(slug, state, event):
     state['events'].append({'at': state['updated_at'], 'event': event})
     if len(state['events']) > 120: state['events'] = state['events'][-120:]
     _, target, projection = paths(slug)
+    try:
+        previous_status = json.loads(target.read_text()).get('status', 'unknown') if target.exists() else 'none'
+    except (OSError, ValueError, TypeError):
+        previous_status = 'unknown'
     atomic(target, json_bytes(state))
     atomic(projection, render(state).encode(), 0o644)
     # For recovery, retain a bounded per-feature snapshot, never trust it as approval.
     atomic(RUNTIME / 'backups' / (slug + '.json'), json_bytes(state))
+    # Observable state-transition metadata; never emit reason, actor, or raw event text.
+    try:
+        import importlib.util
+        location = Path(__file__).resolve().parent / 'trace_events.py'
+        trace_spec = importlib.util.spec_from_file_location('_avrl_trace', location)
+        trace = importlib.util.module_from_spec(trace_spec)
+        trace_spec.loader.exec_module(trace)
+        action = re.match(r'[A-Za-z]+', event or '')
+        trace.append(RUNTIME / 'trace.jsonl', kind='state', origin='controller',
+                     feature=slug, action=action.group().lower() if action else 'event',
+                     from_status=previous_status, to_status=state.get('status'),
+                     round=state.get('round'))
+    except (OSError, ValueError, TypeError, ImportError, AttributeError) as error:
+        print('VORQA TRACE WRITE FAILED:', type(error).__name__, file=sys.stderr)
 
 
 def eval_files(slug):
