@@ -116,3 +116,19 @@ class UntrustedStateTests(unittest.TestCase):
             self.assertEqual(proc.returncode,2)
             self.assertEqual(json.loads(proc.stdout)["reason"], "malformed_controller_response")
             self.assertNotIn("SECRET_STATE_VALUE", proc.stdout)
+
+class SymlinkParentTests(unittest.TestCase):
+    def test_parent_scripts_symlink_rejected(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            root = base / "repository"
+            outside = base / "outside"
+            root.mkdir()
+            outside.mkdir()
+            subprocess.run(["git", "init", "-q", str(root)], check=True, capture_output=True)
+            (root / "specs").mkdir()
+            (outside / "avrl.py").write_text('print("must not execute")\n')
+            (root / "scripts").symlink_to(outside, target_is_directory=True)
+            proc = subprocess.run([sys.executable, str(SCRIPT), "--workspace", str(root), "probe"], capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 2)
+            self.assertEqual(json.loads(proc.stdout)["reason"], "controller_not_installed")
