@@ -109,3 +109,27 @@ class TraceSettingsTests(unittest.TestCase):
 
 if __name__=='__main__':
     unittest.main()
+
+
+class TraceCriterionTests(unittest.TestCase):
+    def test_controller_logs_individual_criterion_results(self):
+        spec=importlib.util.spec_from_file_location('controller_criterion_test',ROOT/'scripts/avrl.py')
+        controller=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(controller)
+        with tempfile.TemporaryDirectory() as temp:
+            folder=Path(temp)
+            runtime=folder/'.avrl'
+            (folder/'specs/example-signup').mkdir(parents=True)
+            state={'feature':'example-signup','status':'reviewing','risk':'medium','round':1,'max_rounds':3,
+                   'events':[],'checks':{'UNIT':{'status':'PASS'},'BROWSER':{'status':'FAIL'}},'reason':None}
+            with patch.object(controller,'ROOT',folder),patch.object(controller,'RUNTIME',runtime):
+                controller.save('example-signup',state,'verification: 1/2')
+            rows=trace.read(runtime/'trace.jsonl')
+            found={(r.get('criterion'),r.get('outcome')) for r in rows if r.get('event')=='criterion'}
+            self.assertEqual(found,{('UNIT','pass'),('BROWSER','fail')})
+
+    def test_agent_type_is_redacted_when_untrusted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target=Path(temp)/'trace.jsonl'
+            trace.append(target,kind='hook',event='SubagentStart',agent_type='SECRET sensitive agent text')
+            self.assertEqual(trace.read(target)[0]['agent_type'],'redacted')
