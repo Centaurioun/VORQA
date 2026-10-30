@@ -39,7 +39,7 @@ def is_safe_blind_command(command):
     if len(parts)<3:return False
     if parts[:2] not in (['python3','scripts/blind_browser.py'],['python','scripts/blind_browser.py']):return False
     action=parts[2]
-    if action not in {'open','text','click','fill','screenshot','reset','select'}:return False
+    if action not in {'open','text','click','fill','screenshot','reset','select','inspect','fill-label','click-role','select-label'}:return False
     # The browser helper validates URLs/selector arguments again.
     return len(parts)<=8
 
