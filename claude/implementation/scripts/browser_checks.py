@@ -35,11 +35,16 @@ def browser_diagnostics_failed(diagnostics):
 
 
 def safe_browser_summary(diagnostics):
-    return {'console_errors':len(diagnostics['console_errors']),
-            'page_errors':len(diagnostics['page_errors']),
-            'failed_requests':len(diagnostics['failed_requests']),
-            'server_error_statuses':[item['status'] for item in diagnostics['server_errors']],
-            'blocked_external_requests':len(diagnostics['blocked_external_requests'])}
+    result = {'console_errors': len(diagnostics['console_errors']),
+              'page_errors': len(diagnostics['page_errors']),
+              'failed_requests': len(diagnostics['failed_requests']),
+              'server_error_statuses': [item['status'] for item in diagnostics['server_errors']],
+              'blocked_external_requests': len(diagnostics['blocked_external_requests'])}
+    failure = diagnostics.get('execution_failure')
+    if failure:
+        result['execution_failure_category'] = failure['category']
+        result['failed_step_index'] = failure['step_index']
+    return result
 
 
 def run_scenario(path,feature):
@@ -62,15 +67,19 @@ def run_scenario(path,feature):
             raise
     artifact=ROOT/'.avrl'/'browser-evidence'/feature
     artifact.mkdir(parents=True,exist_ok=True)
+    blocked_requests=[]
+    diagnostics={'console_errors':[],'page_errors':[],
+                 'failed_requests':[],'server_errors':[],
+                 'blocked_external_requests':blocked_requests,
+                 'execution_failure':None}
+    failed_step=None
+    phase='browser_start'
+    browser=None
     try:
         with sync_playwright() as playwright:
             browser=launch_chromium(playwright)
             viewport=config.get('viewport',{'width':1280,'height':800})
             context=browser.new_context(viewport=viewport,device_scale_factor=1,locale='en-US',color_scheme='light',reduced_motion='reduce')
-            blocked_requests=[]
-            diagnostics={'console_errors':[],'page_errors':[],
-                         'failed_requests':[],'server_errors':[],
-                         'blocked_external_requests':blocked_requests}
             def network_guard(route):
                 target=urlsplit(route.request.url)
                 if target.scheme!='http' or target.netloc!=urlsplit(base).netloc:
@@ -89,6 +98,8 @@ def run_scenario(path,feature):
                 {'status':response.status,'url':response.url}) if response.status>=500 else None)
             page.on('framenavigated' ,lambda frame: loopback_url(frame.url) if frame.url.startswith('http') else None)
             for index,step in enumerate(config['actions']):
+                phase='scenario_action'
+                failed_step=index
                 if 'goto' in step:
                     if not step['goto'].startswith('/') or step['goto'].startswith('//'):raise ValueError('Navigation must be a local path')
                     page.goto(base+step['goto'],wait_until='networkidle',timeout=12000)
@@ -117,15 +128,34 @@ def run_scenario(path,feature):
                         print('VISUAL_ERROR',round(error,5),'LIMIT',limit)
                         if error>limit:raise AssertionError('Visual regression')
                 else:raise ValueError('Unknown browser action: '+str(step))
+            phase='browser_close'
             browser.close()
-            diagnostics_path=artifact/f'diagnostics-{path.stem}.json'
-            diagnostics_path.write_text(json.dumps(diagnostics,sort_keys=True,indent=2)+'\n')
-            print('BROWSER_DIAGNOSTICS',json.dumps(safe_browser_summary(diagnostics),sort_keys=True))
+            browser=None
+            phase='post_run_checks'
+            failed_step=None
             if blocked_requests:raise AssertionError('Unexpected external requests: '+str(len(blocked_requests)))
             if browser_diagnostics_failed(diagnostics):
                 raise AssertionError('Browser diagnostics reported console, runtime, request, or server errors')
         print('BROWSER PASS',path.name)
+    except Exception as error:
+        # Class/phase/index are safe diagnostic metadata; never store exception
+        # text, raw scenario arguments, request URLs or user input here.
+        diagnostics['execution_failure']={
+            'category':type(error).__name__,
+            'phase':phase,
+            'step_index':failed_step,
+        }
+        raise
     finally:
+        if browser is not None:
+            try:
+                browser.close()
+            except Exception:
+                pass  # Preserve original failure; the diagnostic stays available.
+        diagnostics_path=artifact/f'diagnostics-{path.stem}.json'
+        diagnostics_path.write_text(json.dumps(diagnostics,sort_keys=True,indent=2)+'\n')
+        print('BROWSER_DIAGNOSTICS',
+              json.dumps(safe_browser_summary(diagnostics),sort_keys=True))
         if process is not None:
             process.terminate()
             try:process.wait(timeout=4)
