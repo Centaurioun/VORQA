@@ -4,7 +4,7 @@
 
 VORQA is an evidence-oriented, cross-platform autonomous verification and code-review framework. Its goal is a **single auditable core** with separate Claude Code, Codex, Antigravity and GitHub Copilot adapters.
 
-> **Status: repository foundation.** The AVRL v2 implementation and historic reference files are still on the maintainer's Mac under an **untracked** \`claude/\` directory. They have NOT been published or validated by this repository. Do not treat this skeleton as a production-certified tool.
+> **Status: repository foundation.** The AVRL v2 implementation and historic reference files are still on the maintainer's Mac under an **untracked** `claude/` directory. They have NOT been published or validated by this repository. Do not treat this skeleton as a production-certified tool.
 
 ## Platform layout
 
@@ -23,14 +23,14 @@ An agent's claim that work is complete is not proof of completion. VORQA aims to
 
 ## Initial local migration
 
-After pulling the foundation files, keep your existing untracked \`claude/\` sources in place:
+After pulling the foundation files, keep your existing untracked `claude/` sources in place:
 
-\`\`\`bash
+```bash
 git pull --ff-only origin main
 python3 scripts/organize_claude_sources.py --dry-run
-\`\`\`
+```
 
-If the proposed source/destination mapping is correct, run the script again with \`--apply\`. It never stages, commits, pushes, uploads or edits file contents. See [migration instructions](docs/LOCAL_MIGRATION.md).
+If the proposed source/destination mapping is correct, run the script again with `--apply`. It never stages, commits, pushes, uploads or edits file contents. See [migration instructions](docs/LOCAL_MIGRATION.md).
 
 ## Roadmap and rules
 
