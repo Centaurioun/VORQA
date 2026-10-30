@@ -68,8 +68,13 @@ def _valid_evidence(entry: dict, root: Path) -> bool:
     if path.is_absolute() or any(piece in {'.', '..'} for piece in path.parts):
         return False
     location = root / path
-    if location.is_symlink() or any(parent.is_symlink() for parent in location.parents if parent != root):
+    if location.is_symlink():
         return False
+    parent = root
+    for piece in path.parts[:-1]:
+        parent = parent / piece
+        if parent.is_symlink():
+            return False
     try:
         if not location.resolve().is_relative_to(root.resolve()) or not location.is_file():
             return False
