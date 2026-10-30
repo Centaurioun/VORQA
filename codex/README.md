@@ -2,7 +2,11 @@
 
 The first Codex-specific package is under [plugin/vorqa](plugin/vorqa/) with portable `plugin.json`, a compatible `.codex-plugin/plugin.json`, one discoverable `vorqa-workflow` skill, and a small **read-only** Python bridge.
 
-This preview is **not installed on the user's Mac** and has **not been executed as a native Codex plugin**. Plugin auto-activation and lifecycle hook delivery are unverified; this package intentionally contains no hooks or MCP server.
+The original **v0.1.0** bridge package was installed on the user's Mac and tested: direct bridge and explicitly requested bridge calls worked, but ordinary model-driven automatic routing remained unverified/unsuccessful. This branch adds a **new, uninstalled v0.2.0-alpha.1 candidate** with plugin-bundled hook feasibility handlers. Neither native hook delivery nor a production QA gate has been verified; there is no MCP server.
+
+## Experimental native hook pilot (uninstalled)
+
+The experimental candidate includes [hooks/README.md](plugin/vorqa/hooks/README.md) and [two bounded hook handlers](plugin/vorqa/hooks/hooks.json). `UserPromptSubmit` may inject a short, read-only `probe` observation in a trusted initialized Git root. `Stop` does not gate ordinary work; a test-only fixture marker and environment flag allow one continuation for native acceptance testing. **The hook trust review is mandatory** and the candidate must not overwrite the currently installed v0.1.0 without operator consent. No global Codex settings, permissions or other plugins are changed here.
 
 ## Probe a trusted VORQA-initialized workspace
 
