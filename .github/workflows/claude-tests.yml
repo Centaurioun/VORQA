@@ -49,5 +49,6 @@ jobs:
         with:
           name: vorqa-observability-pilot
           path: claude/implementation/.avrl/pilot/summary.json
-          if-no-files-found: warn
+          include-hidden-files: true
+          if-no-files-found: error
           retention-days: 7
