@@ -43,7 +43,7 @@ The temporary candidate plugin and marketplace were removed with Codex CLI's plu
 
 After cleanup, the installed VORQA inventory contained only `vorqa@vorqa-local` v0.1.0, still enabled. Its marketplace revision remained `b5efb79615cd305fbc33ad57f96b31830d9e2811`; the portable manifest, compatibility manifest, skill, and bridge SHA-256 values matched the pre-install snapshot. No other plugin was changed.
 
-Raw CLI and host-session evidence is retained locally under the ignored `.avrl/codex-eval/` run directory. It is not included in this report.
+CLI command stdout/stderr is retained locally under the ignored `.avrl/codex-eval/` run directory. The interactive `/hooks` display was observed in the terminal tool output, but its raw terminal byte stream was not archived; a local observation summary records that limitation. No VORQA event trace exists because no prompt was submitted. Raw prompts and session transcripts were not uploaded.
 
 ## Next gate
 
