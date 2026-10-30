@@ -27,8 +27,12 @@ def inspect_workspace(root: Path) -> tuple[bool, str]:
     """Reject incomplete, non-root, or symlinked controllers before execution."""
     if not root.is_dir():
         return False, "workspace_missing"
-    controller = root / "scripts" / "avrl.py"
-    if not controller.is_file() or controller.is_symlink() or not (root / "specs").is_dir():
+    scripts = root / "scripts"
+    specs = root / "specs"
+    controller = scripts / "avrl.py"
+    if (scripts.is_symlink() or specs.is_symlink() or not controller.is_file()
+            or controller.is_symlink() or not specs.is_dir()
+            or not controller.resolve().is_relative_to(root)):
         return False, "controller_not_installed"
     try:
         result = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"],
