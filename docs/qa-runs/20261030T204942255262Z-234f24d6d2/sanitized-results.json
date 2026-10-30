@@ -1,0 +1,600 @@
+{
+  "browser": {
+    "scenarios": [
+      {
+        "diagnostics": {
+          "blocked_external_requests": 0,
+          "console_errors": 0,
+          "failed_requests": 0,
+          "page_errors": 0,
+          "server_errors": 0
+        },
+        "name": "desktop",
+        "result": "PASS"
+      },
+      {
+        "diagnostics": {
+          "blocked_external_requests": 0,
+          "console_errors": 0,
+          "failed_requests": 0,
+          "page_errors": 0,
+          "server_errors": 0
+        },
+        "name": "mobile",
+        "result": "PASS"
+      },
+      {
+        "diagnostics": {
+          "blocked_external_requests": 0,
+          "console_errors": 0,
+          "failed_requests": 0,
+          "page_errors": 0,
+          "server_errors": 0
+        },
+        "name": "edge",
+        "result": "PASS"
+      }
+    ]
+  },
+  "commands": [
+    {
+      "exit_code": 0,
+      "label": "unit-tests"
+    },
+    {
+      "exit_code": 0,
+      "label": "compileall"
+    },
+    {
+      "exit_code": 0,
+      "label": "settings-json"
+    },
+    {
+      "exit_code": 0,
+      "label": "doctor"
+    },
+    {
+      "exit_code": 0,
+      "label": "browser-desktop"
+    },
+    {
+      "exit_code": 0,
+      "label": "browser-mobile"
+    },
+    {
+      "exit_code": 0,
+      "label": "browser-edge"
+    },
+    {
+      "exit_code": 0,
+      "label": "observability"
+    },
+    {
+      "exit_code": 0,
+      "label": "lifecycle-fixture"
+    },
+    {
+      "exit_code": 0,
+      "label": "lifecycle-full"
+    },
+    {
+      "exit_code": 2,
+      "label": "hook-1"
+    },
+    {
+      "exit_code": 2,
+      "label": "hook-2"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-3"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-4"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-5"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-6"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-7"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-8"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-9"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-10"
+    },
+    {
+      "exit_code": 2,
+      "label": "hook-11"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-12"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-13"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-stop-paused"
+    },
+    {
+      "exit_code": 0,
+      "label": "hook-config-validation"
+    }
+  ],
+  "git_sha": "234f24d6d2a7ab08852c633234abd10d551772c3",
+  "github_actions": "pending PR creation",
+  "hook_configuration_validation": {
+    "configured_command_entries": 13,
+    "event_groups": 12,
+    "missing_or_invalid": [],
+    "status": "passed",
+    "unique_script_paths": [
+      ".claude/hooks/audit-tool-use.sh",
+      ".claude/hooks/block-source-read.sh",
+      ".claude/hooks/enforce-eval-pass.sh",
+      ".claude/hooks/guard-unapproved-code.sh"
+    ]
+  },
+  "lifecycle": {
+    "fixture": {
+      "controller_state_events": [
+        {
+          "action": "initialized",
+          "from_status": "none",
+          "round": 0,
+          "to_status": "in-review"
+        },
+        {
+          "action": "evaluation",
+          "from_status": "in-review",
+          "round": 0,
+          "to_status": "approved"
+        },
+        {
+          "action": "round",
+          "from_status": "approved",
+          "round": 1,
+          "to_status": "building"
+        },
+        {
+          "action": "verification",
+          "from_status": "building",
+          "round": 1,
+          "to_status": "reviewing"
+        },
+        {
+          "action": "reviewer",
+          "from_status": "reviewing",
+          "round": 1,
+          "to_status": "reviewing"
+        },
+        {
+          "action": "blind",
+          "from_status": "reviewing",
+          "round": 1,
+          "to_status": "reviewing"
+        },
+        {
+          "action": "release",
+          "from_status": "reviewing",
+          "round": 1,
+          "to_status": "reviewing"
+        },
+        {
+          "action": "completed",
+          "from_status": "reviewing",
+          "round": 1,
+          "to_status": "completed"
+        }
+      ],
+      "coverage": {
+        "complete": true,
+        "expected": 8,
+        "missing": [],
+        "observed": 8,
+        "total_events": 14
+      },
+      "git_evidence": "disposable-repo",
+      "guards": {
+        "completed_stop_allowed": true,
+        "tampered_review_denied": true
+      },
+      "native_claude_verified": false,
+      "operator_approval": "synthetic-pty-fixture",
+      "qa_mode": "synthetic-fixture",
+      "reviewer_identity": "synthetic-fixture",
+      "stages": [
+        "init",
+        "approve",
+        "round",
+        "verify",
+        "review",
+        "blind",
+        "release-attest",
+        "complete"
+      ],
+      "status": "passed"
+    },
+    "full": {
+      "controller_state_events": [
+        {
+          "action": "initialized",
+          "from_status": "none",
+          "round": 0,
+          "to_status": "in-review"
+        },
+        {
+          "action": "evaluation",
+          "from_status": "in-review",
+          "round": 0,
+          "to_status": "approved"
+        },
+        {
+          "action": "round",
+          "from_status": "approved",
+          "round": 1,
+          "to_status": "building"
+        },
+        {
+          "action": "verification",
+          "from_status": "building",
+          "round": 1,
+          "to_status": "reviewing"
+        },
+        {
+          "action": "reviewer",
+          "from_status": "reviewing",
+          "round": 1,
+          "to_status": "reviewing"
+        },
+        {
+          "action": "blind",
+          "from_status": "reviewing",
+          "round": 1,
+          "to_status": "reviewing"
+        },
+        {
+          "action": "release",
+          "from_status": "reviewing",
+          "round": 1,
+          "to_status": "reviewing"
+        },
+        {
+          "action": "completed",
+          "from_status": "reviewing",
+          "round": 1,
+          "to_status": "completed"
+        }
+      ],
+      "coverage": {
+        "complete": true,
+        "expected": 8,
+        "missing": [],
+        "observed": 8,
+        "total_events": 14
+      },
+      "git_evidence": "disposable-repo",
+      "guards": {
+        "completed_stop_allowed": true,
+        "tampered_review_denied": true
+      },
+      "native_claude_verified": false,
+      "operator_approval": "synthetic-pty-fixture",
+      "qa_mode": "playwright-real-ui",
+      "reviewer_identity": "synthetic-fixture",
+      "stages": [
+        "init",
+        "approve",
+        "round",
+        "verify",
+        "review",
+        "blind",
+        "release-attest",
+        "complete"
+      ],
+      "status": "passed"
+    }
+  },
+  "native_claude_verified": false,
+  "observability": {
+    "api": {
+      "cases": [
+        {
+          "expected": 201,
+          "http_status": 201,
+          "name": "valid_signup"
+        },
+        {
+          "expected": 409,
+          "http_status": 409,
+          "name": "duplicate_signup"
+        },
+        {
+          "expected": 400,
+          "http_status": 400,
+          "name": "invalid_signup"
+        }
+      ],
+      "sqlite_rows": 2,
+      "status": "passed"
+    },
+    "browser": {
+      "scenarios": [
+        {
+          "exit": 0,
+          "name": "desktop"
+        },
+        {
+          "exit": 0,
+          "name": "mobile"
+        },
+        {
+          "exit": 0,
+          "name": "edge"
+        }
+      ],
+      "status": "passed"
+    },
+    "coverage": {
+      "complete": true,
+      "expected": 14,
+      "missing": [],
+      "observed": 14,
+      "total_events": 15
+    },
+    "kind": "synthetic_hook_dispatch_real_git_controller",
+    "native_claude_verified": false,
+    "note": "Real Git, controller, HTTP, SQLite and optional Playwright; hook dispatch synthetic, not Claude native.",
+    "passed": true,
+    "steps": {
+      "failed_tool": {
+        "exit": 0
+      },
+      "in_review_stop": {
+        "exit": 0
+      },
+      "init": {
+        "exit": 0
+      },
+      "pause": {
+        "exit": 0
+      },
+      "paused_stop": {
+        "exit": 0
+      },
+      "permission_denied": {
+        "exit": 0
+      },
+      "permission_request": {
+        "exit": 0
+      },
+      "preapproval_write": {
+        "exit": 2
+      },
+      "session_end": {
+        "exit": 0
+      },
+      "session_start": {
+        "exit": 0
+      },
+      "stop_failure": {
+        "exit": 0
+      },
+      "subagent_start": {
+        "exit": 0
+      },
+      "subagent_stop": {
+        "exit": 0
+      },
+      "successful_tool": {
+        "exit": 0
+      },
+      "task_completed": {
+        "exit": 2
+      },
+      "verify_without_approval": {
+        "exit": 2
+      }
+    }
+  },
+  "overall": "PASS WITH NATIVE HOST LIMITATION",
+  "run_id": "20261030T204942255262Z-234f24d6d2",
+  "tests": {
+    "cases": [
+      {
+        "name": "test_blind_receipt_invalidated_by_event_tampering (test_attestation_evidence.EvidenceTests.test_blind_receipt_invalidated_by_event_tampering)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_blind_rejects_event_commit_or_digest_mismatch (test_attestation_evidence.EvidenceTests.test_blind_rejects_event_commit_or_digest_mismatch)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_blind_rejects_external_or_duplicate_capture (test_attestation_evidence.EvidenceTests.test_blind_rejects_external_or_duplicate_capture)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_blind_rejects_modified_screenshot_and_fake_events (test_attestation_evidence.EvidenceTests.test_blind_rejects_modified_screenshot_and_fake_events)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_completion_requires_untampered_review_and_qa_receipts (test_attestation_evidence.EvidenceTests.test_completion_requires_untampered_review_and_qa_receipts)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_review_pass_requires_report (test_attestation_evidence.EvidenceTests.test_review_pass_requires_report)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_review_receipt_detects_tampering (test_attestation_evidence.EvidenceTests.test_review_receipt_detects_tampering)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_review_rejects_stale_commit_and_contract (test_attestation_evidence.EvidenceTests.test_review_rejects_stale_commit_and_contract)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_accessible_role_and_label_actions (test_blind_browser_controls.BlindBrowserControlsTests.test_accessible_role_and_label_actions)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_controls_discovered_without_source_or_values (test_blind_browser_controls.BlindBrowserControlsTests.test_controls_discovered_without_source_or_values)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_external_requests_are_blocked_and_recorded (test_blind_browser_controls.BlindBrowserControlsTests.test_external_requests_are_blocked_and_recorded)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_sensitive_inputs_not_persisted (test_blind_browser_controls.BlindBrowserControlsTests.test_sensitive_inputs_not_persisted)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_each_browser_error_category_fails (test_browser_diagnostics.BrowserDiagnosticsTests.test_each_browser_error_category_fails)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_empty_diagnostics_are_accepted (test_browser_diagnostics.BrowserDiagnosticsTests.test_empty_diagnostics_are_accepted)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_safe_summary_excludes_error_text_and_urls (test_browser_diagnostics.BrowserDiagnosticsTests.test_safe_summary_excludes_error_text_and_urls)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_status_and_unapproved_execution_denied (test_controller.ControllerGitGates.test_status_and_unapproved_execution_denied)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_duplicate_email_rejected (test_demo.FixtureTests.test_duplicate_email_rejected)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_seeded_disposable_database (test_demo.FixtureTests.test_seeded_disposable_database)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_signup_http_persistence_validation_duplicate_and_unknown_route (test_demo.LocalHttpContractTests.test_signup_http_persistence_validation_duplicate_and_unknown_route)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_clean_positive_path_and_stale_evidence_block (test_full_lifecycle.FullLifecycleTests.test_clean_positive_path_and_stale_evidence_block)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_native_host_is_not_claimed (test_observability_pilot.PilotTests.test_native_host_is_not_claimed)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_real_git_and_hook_decision_pilot (test_observability_pilot.PilotTests.test_real_git_and_hook_decision_pilot)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_contract_digest_changes_with_scenario (test_security.ContractIntegrityTests.test_contract_digest_changes_with_scenario)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_duplicate_criteria_rejected (test_security.ContractIntegrityTests.test_duplicate_criteria_rejected)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_invalid_slug_blocked (test_security.ContractIntegrityTests.test_invalid_slug_blocked)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_no_noninteractive_approvals (test_security.ContractIntegrityTests.test_no_noninteractive_approvals)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_bad_json_fails_closed (test_security.HookAdversarialTests.test_bad_json_fails_closed)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_blind_browser_only_allow (test_security.HookAdversarialTests.test_blind_browser_only_allow)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_blind_source_tool_deny (test_security.HookAdversarialTests.test_blind_source_tool_deny)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_blind_terminal_bypass_patterns_deny (test_security.HookAdversarialTests.test_blind_terminal_bypass_patterns_deny)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_nonblind_is_not_source_blocked (test_security.HookAdversarialTests.test_nonblind_is_not_source_blocked)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_stop_human_pause_no_deadlock (test_security.HookAdversarialTests.test_stop_human_pause_no_deadlock)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_unapproved_write_guard (test_security.HookAdversarialTests.test_unapproved_write_guard)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_controller_records_status_transitions_without_reason (test_trace_events.TraceControllerTests.test_controller_records_status_transitions_without_reason)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_agent_type_is_redacted_when_untrusted (test_trace_events.TraceCriterionTests.test_agent_type_is_redacted_when_untrusted)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_controller_logs_individual_criterion_results (test_trace_events.TraceCriterionTests.test_controller_logs_individual_criterion_results)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_denied_hook_and_failed_tool_are_traced_without_payload (test_trace_events.TraceHookTests.test_denied_hook_and_failed_tool_are_traced_without_payload)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_config_registers_lifecycle_and_failure_events (test_trace_events.TraceSettingsTests.test_config_registers_lifecycle_and_failure_events)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_native_claim_not_supported_by_synthetic_trace (test_trace_events.TraceUnitTests.test_native_claim_not_supported_by_synthetic_trace)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_report_rejects_malformed_jsonl (test_trace_events.TraceUnitTests.test_report_rejects_malformed_jsonl)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_trace_matrix_rejects_missing_observations (test_trace_events.TraceUnitTests.test_trace_matrix_rejects_missing_observations)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_writer_never_serializes_secrets_or_payload (test_trace_events.TraceUnitTests.test_writer_never_serializes_secrets_or_payload)",
+        "result": "PASS"
+      },
+      {
+        "name": "test_invalid_signup_shows_accessible_error (test_ui_static.StaticChromiumChecks.test_invalid_signup_shows_accessible_error)",
+        "result": "PASS"
+      }
+    ],
+    "counts": {
+      "FAIL": 0,
+      "PASS": 43,
+      "SKIP": 0
+    }
+  }
+}
