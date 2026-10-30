@@ -10,6 +10,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import subprocess
 from pathlib import Path
 import sys
 from urllib.parse import urlsplit
@@ -97,6 +98,26 @@ def act_on_control(page, command: str, values: list[str]) -> None:
         raise ValueError('Unsupported accessible control action')
 
 
+def active_receipt_context() -> dict[str, str | int]:
+    """Stamp browser evidence with the currently reviewed local Git state.
+
+    The tool reads internal state, but never exposes this file's source or hidden
+    state contents to the black-box agent. This is integrity metadata, not an
+    independent identity/security attestation.
+    """
+    active = json.loads((ROOT / '.avrl' / 'active.json').read_text())
+    slug = active['feature']
+    if not isinstance(slug, str) or not slug or '/' in slug or '..' in slug:
+        raise ValueError('Invalid active feature')
+    state = json.loads((ROOT / '.avrl' / 'state' / (slug + '.json')).read_text())
+    if state.get('feature') != slug or state.get('status') != 'reviewing':
+        raise ValueError('Blind QA requires an active feature in reviewing state')
+    commit = subprocess.check_output(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], text=True).strip()
+    return {'feature': slug, 'commit': commit, 'round': state['round'],
+            'eval_digest': state['eval_digest'],
+            'verification_nonce': state.get('verification_nonce')}
+
+
 def main() -> None:
     from playwright.sync_api import sync_playwright
     from browser_runtime import launch_chromium
@@ -124,6 +145,7 @@ def main() -> None:
         print('Browser session reset')
         return
 
+    receipt = active_receipt_context()
     saved = json.loads(session.read_text()) if session.exists() else {'url': base + '/signup'}
     saved_url = loopback_url(saved['url'])
     if urlsplit(saved_url).netloc != urlsplit(base).netloc:
@@ -177,7 +199,7 @@ def main() -> None:
             count = len(events.read_text().splitlines()) if events.exists() else 0
             capture = DEST / f'event-{count}.png'
             page.screenshot(path=str(capture), animations='disabled')
-            record = {'at': dt.datetime.now(dt.timezone.utc).isoformat(),
+            record = {**receipt, 'at': dt.datetime.now(dt.timezone.utc).isoformat(),
                       'command': command, 'url': page.url,
                       'capture': str(capture.relative_to(ROOT)),
                       'sha256': hashlib.sha256(capture.read_bytes()).hexdigest()}
