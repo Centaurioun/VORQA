@@ -123,14 +123,44 @@ def audit(event):
 
 
 def main():
-    try:event=json.load(sys.stdin)
-    except Exception:return block('Malformed hook input; fail closed')
-    mode=sys.argv[1]
-    if mode=='blind':return blind_guard(event)
-    if mode=='completion':return completion_guard(event)
-    if mode=='code':return code_guard(event)
-    if mode=='audit':return audit(event)
-    return block('Unknown hook mode')
+    try:
+        event=json.load(sys.stdin)
+        if not isinstance(event,dict):
+            return block('Malformed hook input; expected JSON object')
+    except Exception:
+        return block('Malformed hook input; fail closed')
+    mode=sys.argv[1] if len(sys.argv)>1 else 'unknown'
+    if mode=='blind':
+        result=blind_guard(event)
+    elif mode=='completion':
+        result=completion_guard(event)
+    elif mode=='code':
+        result=code_guard(event)
+    elif mode=='audit':
+        result=audit(event)
+    else:
+        result=block('Unknown hook mode')
+
+    # Trace *outcome* of every handled hook, including denied pre-tool requests
+    # and failed tool calls. Never serialize tool_input, tool_response or prompts.
+    try:
+        sys.path.insert(0,str(ROOT/'scripts'))
+        from trace_events import append
+        state=active()
+        hook_event=event.get('hook_event_name')
+        decision=('blocked' if result==2 else
+                  'observed_failure' if hook_event=='PostToolUseFailure' else
+                  'observed_success' if hook_event=='PostToolUse' else
+                  'allowed' if result==0 else 'error')
+        path=Path(os.environ.get('VORQA_TRACE_FILE',str(RUNTIME/'trace.jsonl')))
+        append(path,kind='hook',origin=os.environ.get('VORQA_TRACE_ORIGIN','unverified'),
+               event=hook_event,handler=mode,decision=decision,
+               reason=('guard_denied' if result==2 else 'observed' if mode=='audit' else 'guard_allowed'),
+               feature=(state or {}).get('feature'),to_status=(state or {}).get('status'),
+               tool_name=event.get('tool_name'),session=event.get('session_id',''))
+    except (OSError,ValueError,TypeError,ImportError) as error:
+        print('VORQA TRACE WRITE FAILED:',type(error).__name__,file=sys.stderr)
+    return result
 
 
 if __name__=='__main__':sys.exit(main())
