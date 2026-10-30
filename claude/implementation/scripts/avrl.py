@@ -149,6 +149,13 @@ def save(slug, state, event):
                      feature=slug, action=action.group().lower() if action else 'event',
                      from_status=previous_status, to_status=state.get('status'),
                      round=state.get('round'))
+        if action and action.group().lower() == 'verification':
+            for criterion, result in state.get('checks', {}).items():
+                outcome = str(result.get('status', '')).lower()
+                if outcome in ('pass', 'fail'):
+                    trace.append(RUNTIME / 'trace.jsonl', kind='scenario', event='criterion',
+                                 feature=slug, criterion=criterion, outcome=outcome,
+                                 round=state.get('round'))
     except (OSError, ValueError, TypeError, ImportError, AttributeError) as error:
         print('VORQA TRACE WRITE FAILED:', type(error).__name__, file=sys.stderr)
 
