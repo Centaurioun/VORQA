@@ -1,0 +1,42 @@
+name: Claude candidate regression suite
+
+on:
+  pull_request:
+    paths:
+      - 'claude/implementation/**'
+      - '.github/workflows/claude-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'claude/implementation/**'
+      - '.github/workflows/claude-tests.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  python-and-browser:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: claude/implementation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install browser dependencies
+        run: |
+          python -m pip install -r requirements-browser.txt
+          python -m playwright install --with-deps chromium
+      - name: Python syntax and configuration
+        run: |
+          python -m compileall -q scripts tests .claude/hooks
+          python -m json.tool .claude/settings.json > /dev/null
+      - name: Unit, security, browser-static regression tests
+        run: python -m unittest discover -s tests -v
+      - name: Live seeded loopback scenario checks
+        run: |
+          python scripts/browser_checks.py --scenario specs/example-signup/scenarios/desktop.json --feature example-signup
+          python scripts/browser_checks.py --scenario specs/example-signup/scenarios/mobile.json --feature example-signup
+          python scripts/browser_checks.py --scenario specs/example-signup/scenarios/edge.json --feature example-signup
