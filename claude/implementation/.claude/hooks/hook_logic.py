@@ -157,7 +157,8 @@ def main():
                event=hook_event,handler=mode,decision=decision,
                reason=('guard_denied' if result==2 else 'observed' if mode=='audit' else 'guard_allowed'),
                feature=(state or {}).get('feature'),to_status=(state or {}).get('status'),
-               tool_name=event.get('tool_name'),session=event.get('session_id',''))
+               tool_name=event.get('tool_name'),agent_type=event.get('agent_type'),
+               session=event.get('session_id',''))
     except (OSError,ValueError,TypeError,ImportError) as error:
         print('VORQA TRACE WRITE FAILED:',type(error).__name__,file=sys.stderr)
     return result
