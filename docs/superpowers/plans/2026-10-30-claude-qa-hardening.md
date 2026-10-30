@@ -21,3 +21,7 @@ Spec: [Blind QA design](../specs/2026-10-30-claude-qa-hardening-design.md)
 
 ## Release limits
 This is a bounded Phase 1 slice, **not completion** of Claude Code hardening or cross-platform certification.
+
+## CI bootstrap
+
+PR #4 established the nested Claude regression workflow on the default branch; its baseline GitHub Actions run passed. This feature PR must receive its own CI execution before it is merged. Native Claude Code host testing remains unperformed.
