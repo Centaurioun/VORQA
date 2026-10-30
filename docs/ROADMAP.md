@@ -22,6 +22,10 @@ The Claude candidate now records sanitized hook outcomes and controller state tr
 
 **Operator decision (2026-10-30):** Do not add branch protection, mandatory external reviewer approvals or additional isolation infrastructure as development milestones. The GitHub review identity auditor remains an optional, read-only tool; it does not enforce merges. Existing hook and acceptance guards stay in place. This changes the target assurance level: do not claim hardened security against a process sharing the same OS user.
 
+### Phase 1 slice 5 — full positive lifecycle acceptance
+
+Add a disposable, real Git/AVRL controller smoke from `init` to `complete` with explicit test-fixture PTY approvals. GitHub CI full mode drives black-box Playwright and checks SQLite persistence; a tampered reviewer report must invalidate the finished state. This does not prove independent human approval or native Claude Code agent dispatch. See [pilot runbook](../claude/implementation/docs/FULL_LIFECYCLE_PILOT.md).
+
 ## Phase 2 — Codex
 
 Build a native skill integration and, when justified, an installable Codex plugin. Reuse the core; do not paste Claude-specific hook semantics into Codex.
