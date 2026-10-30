@@ -12,6 +12,10 @@ The imported AVRL v2 candidate is now tracked at `claude/implementation/`. Phase
 
 Structured reviewer reports and browser event receipts are bound to the Git commit, accepted contract, round and a fresh verifier nonce. The new checks only establish **local evidence consistency**; separate user identities, externally authenticated reviewer sign-off and protected CI release attestations remain release blockers. See [design](superpowers/specs/2026-10-30-review-qa-evidence-integrity-design.md).
 
+### Phase 1 slice 3 — GitHub identity audit (implemented, not enforced)
+
+A read-only, GitHub API-backed PR approval audit evaluates current reviewer account permissions and exact-head approval freshness; high-risk changes request two distinct authorized GitHub accounts. See [identity and branch-protection runbook](GITHUB_REVIEW_POLICY.md). This is **not** a mandatory merge gate: protected branch settings, trusted automatic re-evaluation and real independent reviewers remain P0.
+
 ## Phase 2 — Codex
 
 Build a native skill integration and, when justified, an installable Codex plugin. Reuse the core; do not paste Claude-specific hook semantics into Codex.

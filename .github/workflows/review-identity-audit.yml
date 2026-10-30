@@ -1,0 +1,45 @@
+name: Review identity audit (manual gate)
+
+# IMPORTANT: Opt-in audit only. Not a merge blocker until rulesets / required
+# checks are configured by an authorized repository administrator.
+# Uses trusted main code; never check out or run a PR head.
+on:
+  workflow_dispatch:
+    inputs:
+      pull_request:
+        description: 'Open pull request number'
+        required: true
+        type: string
+      expected_head:
+        description: 'Exact 40-character PR head SHA (checked against GitHub)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  github-review-identity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout trusted default branch only
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Check authenticated PR approvals (fail closed)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          VORQA_REPOSITORY: ${{ github.repository }}
+          VORQA_PR: ${{ inputs.pull_request }}
+          VORQA_HEAD: ${{ inputs.expected_head }}
+        run: |
+          python3 scripts/github_review_policy.py \
+            --repository "$VORQA_REPOSITORY" \
+            --pr "$VORQA_PR" \
+            --head "$VORQA_HEAD"
