@@ -30,6 +30,23 @@ def wait(base,timeout=10):
     raise RuntimeError('Local test server did not start')
 
 
+def browser_diagnostics_failed(diagnostics):
+    return any(diagnostics.values())
+
+
+def safe_browser_summary(diagnostics):
+    result = {'console_errors': len(diagnostics['console_errors']),
+              'page_errors': len(diagnostics['page_errors']),
+              'failed_requests': len(diagnostics['failed_requests']),
+              'server_error_statuses': [item['status'] for item in diagnostics['server_errors']],
+              'blocked_external_requests': len(diagnostics['blocked_external_requests'])}
+    failure = diagnostics.get('execution_failure')
+    if failure:
+        result['execution_failure_category'] = failure['category']
+        result['failed_step_index'] = failure['step_index']
+    return result
+
+
 def run_scenario(path,feature):
     from playwright.sync_api import sync_playwright
     from browser_runtime import launch_chromium
@@ -50,12 +67,19 @@ def run_scenario(path,feature):
             raise
     artifact=ROOT/'.avrl'/'browser-evidence'/feature
     artifact.mkdir(parents=True,exist_ok=True)
+    blocked_requests=[]
+    diagnostics={'console_errors':[],'page_errors':[],
+                 'failed_requests':[],'server_errors':[],
+                 'blocked_external_requests':blocked_requests,
+                 'execution_failure':None}
+    failed_step=None
+    phase='browser_start'
+    browser=None
     try:
         with sync_playwright() as playwright:
             browser=launch_chromium(playwright)
             viewport=config.get('viewport',{'width':1280,'height':800})
             context=browser.new_context(viewport=viewport,device_scale_factor=1,locale='en-US',color_scheme='light',reduced_motion='reduce')
-            blocked_requests=[]
             def network_guard(route):
                 target=urlsplit(route.request.url)
                 if target.scheme!='http' or target.netloc!=urlsplit(base).netloc:
@@ -65,8 +89,17 @@ def run_scenario(path,feature):
                     route.continue_()
             context.route('**/*',network_guard)
             page=context.new_page()
+            page.on('console',lambda message: diagnostics['console_errors'].append(message.text)
+                    if message.type=='error' else None)
+            page.on('pageerror',lambda error: diagnostics['page_errors'].append(str(error)))
+            page.on('requestfailed',lambda request: diagnostics['failed_requests'].append(
+                {'method':request.method,'url':request.url,'failure':request.failure}))
+            page.on('response',lambda response: diagnostics['server_errors'].append(
+                {'status':response.status,'url':response.url}) if response.status>=500 else None)
             page.on('framenavigated' ,lambda frame: loopback_url(frame.url) if frame.url.startswith('http') else None)
             for index,step in enumerate(config['actions']):
+                phase='scenario_action'
+                failed_step=index
                 if 'goto' in step:
                     if not step['goto'].startswith('/') or step['goto'].startswith('//'):raise ValueError('Navigation must be a local path')
                     page.goto(base+step['goto'],wait_until='networkidle',timeout=12000)
@@ -74,6 +107,8 @@ def run_scenario(path,feature):
                     if urlsplit(page.url).netloc!=urlsplit(base).netloc:raise ValueError('Cross-origin redirect blocked')
                 elif 'fill' in step:page.locator(step['fill']).fill(step['value'])
                 elif 'click' in step:page.locator(step['click']).click()
+                elif 'press' in step:
+                    page.locator(step['press']['selector']).press(step['press']['key'])
                 elif 'expect_text' in step:page.get_by_text(step['expect_text'],exact=False).first.wait_for(state='visible',timeout=6000)
                 elif 'expect_role' in step:
                     role=step['expect_role'];page.get_by_role(role['role'],name=role['name']).wait_for(state='visible',timeout=6000)
@@ -93,10 +128,34 @@ def run_scenario(path,feature):
                         print('VISUAL_ERROR',round(error,5),'LIMIT',limit)
                         if error>limit:raise AssertionError('Visual regression')
                 else:raise ValueError('Unknown browser action: '+str(step))
+            phase='browser_close'
             browser.close()
-            if blocked_requests:raise AssertionError('Unexpected external requests: '+str(blocked_requests[:5]))
+            browser=None
+            phase='post_run_checks'
+            failed_step=None
+            if blocked_requests:raise AssertionError('Unexpected external requests: '+str(len(blocked_requests)))
+            if browser_diagnostics_failed(diagnostics):
+                raise AssertionError('Browser diagnostics reported console, runtime, request, or server errors')
         print('BROWSER PASS',path.name)
+    except Exception as error:
+        # Class/phase/index are safe diagnostic metadata; never store exception
+        # text, raw scenario arguments, request URLs or user input here.
+        diagnostics['execution_failure']={
+            'category':type(error).__name__,
+            'phase':phase,
+            'step_index':failed_step,
+        }
+        raise
     finally:
+        if browser is not None:
+            try:
+                browser.close()
+            except Exception:
+                pass  # Preserve original failure; the diagnostic stays available.
+        diagnostics_path=artifact/f'diagnostics-{path.stem}.json'
+        diagnostics_path.write_text(json.dumps(diagnostics,sort_keys=True,indent=2)+'\n')
+        print('BROWSER_DIAGNOSTICS',
+              json.dumps(safe_browser_summary(diagnostics),sort_keys=True))
         if process is not None:
             process.terminate()
             try:process.wait(timeout=4)

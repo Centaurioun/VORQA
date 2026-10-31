@@ -1,0 +1,88 @@
+{
+  "branch": "qa/comprehensive-validation-2026-10-30",
+  "browser": {
+    "failed": 0,
+    "origin": "real-playwright-chromium",
+    "passed": 3,
+    "scenarios": 3
+  },
+  "commands": {
+    "blocked": 0,
+    "failed": 3,
+    "final_campaign": 25,
+    "origin": "local-process"
+  },
+  "git_sha": "234f24d6d2a7ab08852c633234abd10d551772c3",
+  "github_actions": {
+    "artifact_expires_at": "2026-11-06T20:54:15Z",
+    "artifact_id": 13010299766,
+    "artifact_name": "vorqa-observability-pilot",
+    "artifact_url": "https://github.com/Centaurioun/VORQA/actions/runs/41126724426/artifacts/13010299766",
+    "claude_candidate_conclusion": "success",
+    "claude_candidate_run_id": 41126724426,
+    "claude_candidate_steps": 10,
+    "foundation_conclusion": "success",
+    "foundation_run_id": 41126724273
+  },
+  "hook_configuration_validation": {
+    "configured_command_entries": 13,
+    "event_groups": 12,
+    "missing_or_invalid": [],
+    "status": "passed",
+    "unique_script_paths": [
+      ".claude/hooks/audit-tool-use.sh",
+      ".claude/hooks/block-source-read.sh",
+      ".claude/hooks/enforce-eval-pass.sh",
+      ".claude/hooks/guard-unapproved-code.sh"
+    ]
+  },
+  "hooks": {
+    "configured_command_entries": 13,
+    "configured_event_groups": 12,
+    "native_events_observed": 0,
+    "native_status": "UNVERIFIED",
+    "synthetic_configured_handler_invocations": 14
+  },
+  "lifecycle": {
+    "approval_origin": "synthetic-pty-fixture",
+    "fixture": "passed",
+    "full": "passed",
+    "reviewer_origin": "synthetic-fixture",
+    "stages_expected": 8,
+    "stages_observed_fixture": 8,
+    "stages_observed_full": 8,
+    "state_events": 8
+  },
+  "native_claude_verified": false,
+  "observability": {
+    "api_cases": [
+      {
+        "http_status": 201,
+        "name": "valid_signup"
+      },
+      {
+        "http_status": 409,
+        "name": "duplicate_signup"
+      },
+      {
+        "http_status": 400,
+        "name": "invalid_signup"
+      }
+    ],
+    "hook_expected_patterns": 14,
+    "hook_observed_patterns": 14,
+    "origin": "real-http-sqlite+synthetic-hooks",
+    "passed": true,
+    "sqlite_rows": 2
+  },
+  "report_complete": true,
+  "run_id": "20261030T204942255262Z-234f24d6d2",
+  "schema_version": 1,
+  "unit_tests": {
+    "discovered": 43,
+    "fail": 0,
+    "origin": "local-process",
+    "pass": 43,
+    "skip": 0
+  }
+}
