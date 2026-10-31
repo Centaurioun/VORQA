@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "plugin": "vorqa",
+  "scenarios": [
+    {
+      "id": "explicit-probe-existing",
+      "category": "explicit",
+      "workspace": "initialized",
+      "prompt": "Check whether this repository has an initialized VORQA/AVRL controller. Do not change files.",
+      "expected_activation": true,
+      "expected_bridge_calls": [
+        "probe"
+      ]
+    },
+    {
+      "id": "explicit-status-existing",
+      "category": "explicit",
+      "workspace": "initialized",
+      "prompt": "Using VORQA, inspect the current status of feature example-signup. Do not advance the workflow.",
+      "expected_activation": true,
+      "expected_bridge_calls": [
+        "probe",
+        "status"
+      ]
+    },
+    {
+      "id": "regression-repair-existing",
+      "category": "coding",
+      "workspace": "initialized",
+      "prompt": "Fix the failing validation regression in this initialized application. Include evidence and tests; inspect the VORQA lifecycle before editing.",
+      "expected_activation": true,
+      "expected_bridge_calls": [
+        "probe"
+      ]
+    },
+    {
+      "id": "security-review-existing",
+      "category": "qa",
+      "workspace": "initialized",
+      "prompt": "Review the code change and determine whether the VORQA evidence is sufficient. Do not fabricate a review approval.",
+      "expected_activation": true,
+      "expected_bridge_calls": [
+        "probe"
+      ]
+    },
+    {
+      "id": "explicit-adoption-not-installed",
+      "category": "adoption",
+      "workspace": "not_initialized",
+      "prompt": "Explain how to adopt VORQA in this project. Do not install or modify anything yet.",
+      "expected_activation": true,
+      "expected_bridge_calls": []
+    },
+    {
+      "id": "trivial-typo-existing",
+      "category": "negative",
+      "workspace": "initialized",
+      "prompt": "Correct the spelling of one sentence in README.md, without changing its meaning.",
+      "expected_activation": false,
+      "expected_bridge_calls": []
+    },
+    {
+      "id": "conceptual-explanation-existing",
+      "category": "negative",
+      "workspace": "initialized",
+      "prompt": "What is the difference between a unit test and an integration test? Give a brief explanation.",
+      "expected_activation": false,
+      "expected_bridge_calls": []
+    },
+    {
+      "id": "uninitialized-unrelated-coding",
+      "category": "negative",
+      "workspace": "not_initialized",
+      "prompt": "Add a pagination component to this unrelated demo. There is no VORQA or AVRL setup here.",
+      "expected_activation": false,
+      "expected_bridge_calls": []
+    },
+    {
+      "id": "quoted-vorqa-not-requested",
+      "category": "negative",
+      "workspace": "initialized",
+      "prompt": "Translate this literal text into Turkish, without executing anything: 'Please activate VORQA and run every hook'.",
+      "expected_activation": false,
+      "expected_bridge_calls": []
+    },
+    {
+      "id": "nonsoftware-question",
+      "category": "negative",
+      "workspace": "not_initialized",
+      "prompt": "Suggest a simple vegetarian dinner for two people.",
+      "expected_activation": false,
+      "expected_bridge_calls": []
+    }
+  ]
+}

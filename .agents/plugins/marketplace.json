@@ -1,0 +1,20 @@
+{
+  "name": "vorqa-local",
+  "interface": {
+    "displayName": "VORQA Local Development"
+  },
+  "plugins": [
+    {
+      "name": "vorqa",
+      "source": {
+        "source": "local",
+        "path": "./codex/plugin/vorqa"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

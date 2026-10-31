@@ -21,6 +21,14 @@ Run the focused unit tests (safe disposable Git fixtures):
 python3 -m unittest discover -s codex/plugin/vorqa/tests -v
 ```
 
+## Activation evaluation infrastructure
+
+This stacked follow-up adds an **opt-in** marketplace at `.agents/plugins/marketplace.json` and a versioned, ten-scenario evaluation matrix under [plugin/vorqa/eval/](plugin/vorqa/eval/). The test cases include both expected activation and **must-not-activate** requests.
+
+The deterministic `acceptance_eval.py` checks a reported observation against local evidence hashes and rejects missing or mismatched entries. It intentionally reports `self_reported_artifact_checksum_only` and never certifies the Codex host's actual skill selection. Plugin Eval's structural analysis is a different test from real Codex activation. See [the native host acceptance task](plugin/vorqa/eval/CODEX_HOST_TASK.md).
+
+The marketplace makes the package discoverable but **does not install, enable or auto-run it**; no user or global Codex config is changed. Native activation is still unverified.
+
 ## Next acceptance gates
 
 1. **Native Codex plugin discovery** on the actual installed Codex Desktop/CLI, including skill selection with positive and negative user requests.
