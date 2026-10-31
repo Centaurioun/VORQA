@@ -5,6 +5,7 @@ import hashlib
 import json
 import tempfile
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 
@@ -83,6 +84,28 @@ class EvalTests(unittest.TestCase):
             evaluator.evaluate(self.catalog,{'schema_version':1,'observations':[self.observation('fake-id',False,[])]},self.root)
         with self.assertRaisesRegex(ValueError, 'boolean'):
             evaluator.evaluate(self.catalog,{'schema_version':1,'observations':[{'scenario_id':'explicit-probe-existing','outcome':'completed','selected_skill':'yes','bridge_calls':[]}]},self.root)
+
+    def test_unhashable_observation_fields_are_sanitized_invalid_input(self):
+        valid = self.observation('explicit-probe-existing', True, ['probe'])
+        malformed = []
+        for field, value in (('scenario_id', []), ('outcome', []), ('bridge_calls', [[]])):
+            item = dict(valid)
+            item[field] = value
+            malformed.append(item)
+
+        script = ROOT / 'eval' / 'acceptance_eval.py'
+        for item in malformed:
+            with self.subTest(item=item):
+                observations = self.root / 'observations.json'
+                observations.write_text(json.dumps({'schema_version': 1, 'observations': [item]}))
+                process = subprocess.run(
+                    [sys.executable, str(script), '--observations', str(observations),
+                     '--evidence-root', str(self.root)],
+                    capture_output=True, text=True, timeout=20)
+                self.assertEqual(process.returncode, 2, process.stderr)
+                self.assertEqual(process.stderr, '')
+                self.assertEqual(json.loads(process.stdout),
+                                 {'verdict': 'INVALID_INPUT', 'error_type': 'ValueError'})
 
     def test_blocked_execution_not_counted_as_false_negative(self):
         a=self.observation('explicit-probe-existing',None,[],state='blocked',proof=False)

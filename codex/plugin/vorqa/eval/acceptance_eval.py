@@ -43,17 +43,19 @@ def _catalog(catalog: dict) -> list[dict]:
 
 
 def _validate_observation(item: dict, known: set[str]):
-    if not isinstance(item, dict) or item.get('scenario_id') not in known:
+    scenario_id = item.get('scenario_id') if isinstance(item, dict) else None
+    if not isinstance(scenario_id, str) or scenario_id not in known:
         raise ValueError('unknown or invalid scenario id in observation')
-    if item.get('outcome') not in ALLOWED_OUTCOMES:
+    outcome = item.get('outcome')
+    if not isinstance(outcome, str) or outcome not in ALLOWED_OUTCOMES:
         raise ValueError('invalid observation outcome')
     selected = item.get('selected_skill')
     if selected is not None and type(selected) is not bool:
         raise ValueError('selected_skill must be boolean or null')
     calls = item.get('bridge_calls')
-    if not isinstance(calls, list) or any(v not in ALLOWED_CALLS for v in calls):
+    if not isinstance(calls, list) or any(not isinstance(v, str) or v not in ALLOWED_CALLS for v in calls):
         raise ValueError('unknown bridge action in observation')
-    if item['outcome'] == 'completed' and selected is None:
+    if outcome == 'completed' and selected is None:
         raise ValueError('completed observation requires boolean selected_skill')
 
 
