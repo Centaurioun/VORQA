@@ -24,10 +24,12 @@ jobs:
         run: python3 -m unittest discover -s tests -p 'test_github_review_policy.py' -v
       - name: Test Codex plugin preview bridge and package metadata
         run: python3 -m unittest discover -s codex/plugin/vorqa/tests -v
+      - name: Test opt-in AVRL project bootstrap and positive Codex bridge smoke
+        run: python3 -m unittest discover -s tests -p 'test_codex_avrl_setup.py' -v
       - name: Validate Codex plugin syntax and manifests
         run: |
           python3 -m py_compile codex/plugin/vorqa/scripts/bridge.py codex/plugin/vorqa/tests/test_bridge.py
           python3 -m json.tool codex/plugin/vorqa/plugin.json > /dev/null
           python3 -m json.tool codex/plugin/vorqa/.codex-plugin/plugin.json > /dev/null
       - name: Compile repository governance helpers
-        run: python3 -m py_compile scripts/organize_claude_sources.py scripts/github_review_policy.py
+        run: python3 -m py_compile scripts/organize_claude_sources.py scripts/github_review_policy.py scripts/codex_avrl_setup.py
