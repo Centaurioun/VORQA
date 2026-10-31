@@ -67,7 +67,9 @@ def observed_status(root: Path, feature: str) -> tuple[bool, str, dict[str, obje
         return False, "malformed_controller_response", {}
     if not isinstance(state, dict) or state.get("feature") != feature:
         return False, "mismatched_controller_response", {}
-    if state.get("status") not in STATUSES or state.get("risk") not in RISKS:
+    status = state.get("status")
+    risk = state.get("risk")
+    if not isinstance(status, str) or status not in STATUSES or not isinstance(risk, str) or risk not in RISKS:
         return False, "malformed_controller_response", {}
     if any(type(state.get(key)) is not int or not 0 <= state[key] <= 100
            for key in ("round", "max_rounds")):
