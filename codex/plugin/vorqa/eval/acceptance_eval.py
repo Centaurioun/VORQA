@@ -12,7 +12,10 @@ import json
 from pathlib import Path
 import re
 
-ALLOWED_CALLS = frozenset({'probe', 'status'})
+ALLOWED_CONTROLLER_COMMANDS = frozenset({
+    'approve', 'blind', 'complete', 'release-attest', 'review', 'round', 'status', 'verify'
+})
+ALLOWED_CALLS = frozenset({'probe', 'status'} | {f'controller:{name}' for name in ALLOWED_CONTROLLER_COMMANDS})
 ALLOWED_OUTCOMES = frozenset({'completed', 'blocked', 'error'})
 ID = re.compile(r'^[a-z][a-z0-9-]{2,60}$')
 SHA = re.compile(r'^[0-9a-f]{64}$')

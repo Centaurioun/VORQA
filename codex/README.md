@@ -1,41 +1,26 @@
-# Codex adapter — developer preview (not certified)
+# Codex adapter — v0.2.0-preview.1
 
-The first Codex-specific package is under [plugin/vorqa](plugin/vorqa/) with portable `plugin.json`, a compatible `.codex-plugin/plugin.json`, one discoverable `vorqa-workflow` skill, and a small **read-only** Python bridge.
+VORQA's hook-free Codex preview contains the portable plugin manifest, the Codex compatibility manifest, the `vorqa-workflow` skill and a bounded bridge to a pre-existing AVRL workspace. The normal user profile's previously installed `vorqa@vorqa-local` v0.1.0 is a separate installation; do not assume GitHub changes update its cached copy.
 
-This preview is **not installed on the user's Mac** and has **not been executed as a native Codex plugin**. Plugin auto-activation and lifecycle hook delivery are unverified; this package intentionally contains no hooks or MCP server.
+The exact plugin and user guide are in [plugin/vorqa](plugin/vorqa/README.md). The GitHub marketplace at `.agents/plugins/marketplace.json` points to `./codex/plugin/vorqa` and makes the package available; it does not install or enable the plugin.
 
-## Probe a trusted VORQA-initialized workspace
+## Install from GitHub
 
-```bash
-python3 codex/plugin/vorqa/scripts/bridge.py --workspace /path/to/existing/avrl-workspace probe
-python3 codex/plugin/vorqa/scripts/bridge.py --workspace /path/to/existing/avrl-workspace status --feature example-signup
+On a disposable Codex profile, use supported CLI commands:
+
+```sh
+codex plugin marketplace add Centaurioun/VORQA --ref main
+codex plugin marketplace list
+codex plugin add vorqa@vorqa-local
+codex plugin list --marketplace vorqa-local
 ```
 
-Commands above run from the **VORQA repository root**. Only point them at source you trust. The target Git repository must already contain `scripts/avrl.py` at its root and a `specs/` directory. The plugin does **not** install that controller into arbitrary applications.
+After installing, verify the manifest version and explicitly invoke `$vorqa-workflow`. Use `codex plugin marketplace upgrade` only when refreshing a Git-backed source. Do not edit Codex configuration or plugin cache files manually. If the marketplace name is already configured, inspect its source before replacing anything.
 
-The bridge returns machine-readable, bounded diagnostic metadata. Even `status: completed` is **observed only**, not a fresh verification of PASS evidence or genuine independent approval. The canonical AVRL controller still owns all approvals and final completion decisions.
+## Runtime evidence and limits
 
-Run the focused unit tests (safe disposable Git fixtures):
+The v0.2.0-preview.1 source passed 56 VORQA tests and 22 Foundation tests. Earlier isolated host runs observed explicit skill/bridge invocation and trusted-controller `probe`/`status`; they do not establish that the final changed default prompt was reloaded, that activation is automatic, or that the complete lifecycle is accepted. Automatic skill activation is best-effort. Native hooks are excluded and unverified.
 
-```bash
-python3 -m unittest discover -s codex/plugin/vorqa/tests -v
-```
+`probe` is a structural availability check. `status` reports `observed_unverified`, not PASS, approval, review, completion, or release readiness. The bridge verifies pinned controller source before running it and does not initialize/copy AVRL into a project. Its explicitly requested **state-changing** stages include `controller round`, `controller verify`, `controller review`, `controller blind` and `controller complete`. `controller approve` and `controller release-attest` stop with `operator_handoff_required`; only an authorized human may perform those decisions through a separately governed process. `verify` executes project-defined commands with the user's OS permissions; this bridge is **not an OS sandbox**.
 
-## Activation evaluation infrastructure
-
-This stacked follow-up adds an **opt-in** marketplace at `.agents/plugins/marketplace.json` and a versioned, ten-scenario evaluation matrix under [plugin/vorqa/eval/](plugin/vorqa/eval/). The test cases include both expected activation and **must-not-activate** requests.
-
-The deterministic `acceptance_eval.py` checks a reported observation against local evidence hashes and rejects missing or mismatched entries. It intentionally reports `self_reported_artifact_checksum_only` and never certifies the Codex host's actual skill selection. Plugin Eval's structural analysis is a different test from real Codex activation. See [the native host acceptance task](plugin/vorqa/eval/CODEX_HOST_TASK.md).
-
-The marketplace makes the package discoverable but **does not install, enable or auto-run it**; no user or global Codex config is changed. Native activation is still unverified.
-
-## Next acceptance gates
-
-1. **Native Codex plugin discovery** on the actual installed Codex Desktop/CLI, including skill selection with positive and negative user requests.
-2. **Runtime deployment design**: safely supply the canonical controller to external application repositories without copying Claude-specific hook semantics.
-3. **Controlled full workflow**: verify actual Codex tool/agent events and controller state; never infer native host events from synthetic data.
-4. **Plugin Eval**: activation rate, false triggers, model/tool calls and real acceptance scenarios.
-
-See [Superpowers design](../docs/superpowers/specs/2026-10-31-codex-plugin-foundation-design.md), [implementation plan](../docs/superpowers/plans/2026-10-31-codex-plugin-foundation.md), and [Codex architecture assessment PR #10](https://github.com/Centaurioun/VORQA/pull/10).
-
-Claude-specific hooks must not be copied into Codex without verifying their actual support and enforcement. No branch protection or additional isolation infrastructure is introduced here.
+No repository-wide LICENSE is included. The selected license intent does not resolve rights for every historical item; this preview excludes transcripts and hook experiments. Public release remains pending source-rights clearance.

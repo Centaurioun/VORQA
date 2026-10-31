@@ -4,9 +4,9 @@
 
 Create the root README, agent rules, source inventory, safe local organizer, public-source policy, and four adapter directories. Source import completed through PR #2. Phase 0 did not certify Claude runtime behavior.
 
-## Phase 1 — Claude Code hardening (in progress)
+## Phase 1 — Claude Code core and adapter work (existing candidate; outside current active priority)
 
-The imported AVRL v2 candidate is now tracked at `claude/implementation/`. Phase 1 proceeds as bounded, test-backed slices; see [first design](superpowers/specs/2026-10-30-claude-qa-hardening-design.md) and [implementation plan](superpowers/plans/2026-10-30-claude-qa-hardening.md). Address independent human/reviewer approval, evidence authenticity, browser isolation/selector discovery, configurable server adapters, independent mockups, regression coverage, concurrency, crash recovery and maintainability. Claude Code integration tests are deferred until the target host is used.
+The imported AVRL v2 candidate is tracked at `claude/implementation/`. The earlier Phase 1 plan is documented in [first design](superpowers/specs/2026-10-30-claude-qa-hardening-design.md) and [implementation plan](superpowers/plans/2026-10-30-claude-qa-hardening.md); its outstanding items include independent human/reviewer approval, evidence authenticity, browser isolation/selector discovery, configurable server adapters, independent mockups, regression coverage, concurrency, crash recovery and maintainability. They are not active work in the current Codex-focused Goal. Claude Code integration tests remain deferred until the target host is used.
 
 ### Phase 1 slice 2 — evidence-bound review and QA
 
@@ -26,18 +26,18 @@ The Claude candidate now records sanitized hook outcomes and controller state tr
 
 Add a disposable, real Git/AVRL controller smoke from `init` to `complete` with explicit test-fixture PTY approvals. GitHub CI full mode drives black-box Playwright and checks SQLite persistence; a tampered reviewer report must invalidate the finished state. This does not prove independent human approval or native Claude Code agent dispatch. See [pilot runbook](../claude/implementation/docs/FULL_LIFECYCLE_PILOT.md).
 
-## Phase 2 — Codex
+## Phase 2 — Codex integration completion (explicit-workflow preview delivered)
 
-Build a native skill integration and, when justified, an installable Codex plugin. Reuse the core; do not paste Claude-specific hook semantics into Codex.
+Complete a useful, explicit Codex workflow over the shared AVRL core and prove it with host-observable acceptance. The previously reported installed v0.1.0 bridge provides read-only `probe` and `status` diagnostics. The hook-free v0.2.0-preview.1 integration on GitHub main `29ad871abe16515cfa8ffe2fbc1dcf0a4ce3f33b` adds explicit lifecycle operations and passed 56 VORQA and 22 Foundation tests. Prior isolated Codex runs observed explicit bridge/probe/status behavior; automatic activation and full lifecycle remain unverified. The separate v0.2.0-alpha.1 hook pilot and PR #19 packaging hardening remain hook experiments; neither native hook delivery nor trust acceptance is verified. Local tests and shell bridge calls are not host acceptance. See the [Codex evidence matrix](release/codex-evidence-matrix.md) and [release gates](release/codex-release-gates.md).
 
-## Phase 3 — Antigravity
+## Phase 3 — Antigravity (deferred)
 
-Map supported skill/rule discovery and tool permissions to the VORQA core, then test on Antigravity.
+Retain existing adapter material. Do not develop or claim a verified Antigravity adapter during the active Codex-only work.
 
-## Phase 4 — GitHub Copilot
+## Phase 4 — GitHub Copilot (deferred)
 
-Implement native repo guidance, custom agent, skills and hook configuration using the supported Copilot environment, with honest limits.
+Retain existing adapter material. Do not develop or claim a verified Copilot adapter during the active Codex-only work.
 
-## Phase 5 — Production release
+## Phase 5 — Codex-only public release (blocked; `RELEASE NO-GO`)
 
-Add real target-host test matrices, independent audit and CI release gates, reproducible packaging, approved license and verified provenance. No platform is "done" merely because a directory exists.
+Prepare a release only for the exact Codex feature set demonstrated by evidence. The three preview documents define scope, evidence and gates. Public release remains blocked by unresolved source-rights/provenance for historical repository content and signer identity trust. The local preview package and disposable install/rollback evidence do not waive these requirements. Do not publish or describe the candidate as production-ready while these gates remain open. Native hooks are excluded unless separately accepted; the present pilot remains experimental. See [Codex preview](release/codex-preview.md), [evidence matrix](release/codex-evidence-matrix.md) and [release gates](release/codex-release-gates.md).
