@@ -6,7 +6,7 @@ The original **v0.1.0** bridge package was installed on the user's Mac and teste
 
 ## Experimental native hook pilot (uninstalled)
 
-The experimental candidate includes [hooks/README.md](plugin/vorqa/hooks/README.md) and [two bounded hook handlers](plugin/vorqa/hooks/hooks.json). `UserPromptSubmit` may inject a short, read-only `probe` observation in a trusted initialized Git root. `Stop` does not gate ordinary work; a test-only fixture marker and environment flag allow one continuation for native acceptance testing. **The hook trust review is mandatory** and the candidate must not overwrite the currently installed v0.1.0 without operator consent. No global Codex settings, permissions or other plugins are changed here.
+The experimental candidate includes [hooks/README.md](plugin/vorqa/hooks/README.md) and registers one bounded `UserPromptSubmit` handler in [hooks/hooks.json](plugin/vorqa/hooks/hooks.json). It may inject a short, read-only `probe` observation in a trusted initialized Git root. The dispatcher retains `Stop` implementation and fixture tests, but the first candidate does not register `Stop`; no native Stop behavior is claimed. Native prompt delivery and model-visible context remain unverified. **The hook trust review is mandatory** and the candidate must not overwrite the currently installed v0.1.0 without operator consent. No global Codex settings, permissions or other plugins are changed here.
 
 ## Probe a trusted VORQA-initialized workspace
 
