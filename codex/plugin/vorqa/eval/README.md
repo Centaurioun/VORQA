@@ -37,6 +37,8 @@ Store raw Codex/Playwright/terminal logs under `.avrl/codex-eval/<run-id>/eviden
 
 **This is a schema example, NOT a claim of observed activation.** Record `outcome: "blocked"`, `selected_skill: null` and `bridge_calls: []` when a host test cannot run. Leave untested scenarios out of the array entirely; they become `NOT_RUN`. Do not manufacture a plausible event.
 
+For explicit workflow scenarios, record the bridge action with the allowlisted controller command, for example `"controller:verify"` or `"controller:complete"`. The report records the observed command name only; it does not promote the controller's result to independent review, human approval, native hook delivery, or authenticated host evidence.
+
 Run:
 
 ```bash

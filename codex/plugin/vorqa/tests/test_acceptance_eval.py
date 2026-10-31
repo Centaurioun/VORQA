@@ -158,6 +158,19 @@ class EvalTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'action'):
             evaluator.evaluate(catalog,{'schema_version':1,'observations':[]},self.root)
 
+    def test_catalog_accepts_allowlisted_pinned_controller_calls(self):
+        catalog=json.loads(json.dumps(self.catalog))
+        catalog['scenarios'][0]['expected_bridge_calls']=['controller:verify']
+        observation=self.observation(catalog['scenarios'][0]['id'], True, ['controller:verify'])
+        result=evaluator.evaluate(catalog,{'schema_version':1,'observations':[observation]},self.root)
+        self.assertEqual(result['results'][0]['status'],'PASS')
+
+    def test_catalog_rejects_unknown_pinned_controller_calls(self):
+        catalog=json.loads(json.dumps(self.catalog))
+        catalog['scenarios'][0]['expected_bridge_calls']=['controller:arbitrary-shell']
+        with self.assertRaisesRegex(ValueError,'action'):
+            evaluator.evaluate(catalog,{'schema_version':1,'observations':[]},self.root)
+
 
 if __name__ == '__main__':
     unittest.main()
