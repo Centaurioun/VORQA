@@ -93,7 +93,10 @@ def handle(data: object) -> dict:
     cwd = data.get('cwd')
     if not isinstance(cwd, str) or not cwd or '\x00' in cwd:
         return quiet()
-    root = Path(cwd).resolve()
+    try:
+        root = Path(cwd).resolve()
+    except (OSError, RuntimeError):
+        return quiet()
     event = data.get('hook_event_name')
     if event == 'UserPromptSubmit':
         return prompt_hook(data, root)

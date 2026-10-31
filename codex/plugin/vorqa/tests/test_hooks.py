@@ -1,14 +1,19 @@
 """Native-hook pilot contract tests. They cannot certify Codex-host event delivery."""
 import json
+import importlib.util
 import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 HANDLER = ROOT / "hooks/dispatcher.py"
+SPEC = importlib.util.spec_from_file_location("vorqa_hook_dispatcher", HANDLER)
+DISPATCHER = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(DISPATCHER)
 
 class HookTests(unittest.TestCase):
     def setUp(self):
@@ -80,6 +85,13 @@ class HookTests(unittest.TestCase):
                            capture_output=True, text=True)
         self.assertEqual(p.returncode, 0)
         self.assertEqual(json.loads(p.stdout), {"continue": True})
+
+    def test_path_resolution_failure_fails_open(self):
+        with patch("pathlib.Path.resolve", side_effect=RuntimeError("symlink loop")):
+            result = DISPATCHER.handle({"hook_event_name": "UserPromptSubmit",
+                                        "cwd": str(self.root),
+                                        "prompt": "Fix the validation regression"})
+        self.assertEqual(result, {"continue": True})
 
     def test_dispatcher_emits_one_json_object(self):
         data = {"hook_event_name": "UnknownEvent", "cwd": str(self.root)}
