@@ -117,6 +117,29 @@ class UntrustedStateTests(unittest.TestCase):
             self.assertEqual(json.loads(proc.stdout)["reason"], "malformed_controller_response")
             self.assertNotIn("SECRET_STATE_VALUE", proc.stdout)
 
+    def test_non_string_status_and_risk_are_rejected_without_traceback(self):
+        for field, value in (("status", []), ("risk", {})):
+            with self.subTest(field=field):
+                with tempfile.TemporaryDirectory() as temp:
+                    root = Path(temp)
+                    subprocess.run(["git", "init", "-q", str(root)], check=True, capture_output=True)
+                    (root / "scripts").mkdir()
+                    (root / "specs").mkdir()
+                    state = {"feature": "sample-feature", "status": "reviewing", "risk": "high",
+                             "round": 1, "max_rounds": 3}
+                    state[field] = value
+                    source = "import json\nprint(json.dumps(" + repr(state) + "))\n"
+                    (root / "scripts/avrl.py").write_text(source)
+                    proc = subprocess.run(
+                        [sys.executable, str(SCRIPT), "--workspace", str(root),
+                         "status", "--feature", "sample-feature"],
+                        capture_output=True, text=True, timeout=20,
+                    )
+                    self.assertEqual(proc.returncode, 2, proc.stderr)
+                    payload = json.loads(proc.stdout)
+                    self.assertEqual(payload["reason"], "malformed_controller_response")
+                    self.assertNotIn("Traceback", proc.stderr)
+
 class SymlinkParentTests(unittest.TestCase):
     def test_parent_scripts_symlink_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
