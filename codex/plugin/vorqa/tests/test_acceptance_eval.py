@@ -76,6 +76,33 @@ class EvalTests(unittest.TestCase):
             result=evaluator.evaluate(self.catalog,{'schema_version':1,'observations':[a]},self.root)
             self.assertEqual(result['results'][0]['status'],'BLOCKED')
 
+    def test_evidence_beneath_symlinked_temp_ancestor_is_accepted(self):
+        actual_parent = self.root / 'actual-parent'
+        actual_parent.mkdir()
+        linked_parent = self.root / 'linked-parent'
+        linked_parent.symlink_to(actual_parent, target_is_directory=True)
+        evidence_root = linked_parent / 'evidence'
+        evidence_root.mkdir()
+        content = b'REDACTED CODEX SESSION EVIDENCE\n'
+        evidence_file = evidence_root / 'proof.log'
+        evidence_file.write_bytes(content)
+        observation = {
+            'scenario_id': 'explicit-probe-existing',
+            'outcome': 'completed',
+            'selected_skill': True,
+            'bridge_calls': ['probe'],
+            'artifact': {
+                'file': 'proof.log',
+                'sha256': hashlib.sha256(content).hexdigest(),
+            },
+        }
+        result = evaluator.evaluate(
+            self.catalog,
+            {'schema_version': 1, 'observations': [observation]},
+            evidence_root,
+        )
+        self.assertEqual(result['results'][0]['status'], 'PASS')
+
     def test_duplicate_unknown_or_malformed_observation_fails_closed(self):
         a=self.observation('explicit-probe-existing',True,['probe'])
         with self.assertRaisesRegex(ValueError, 'duplicate'):
