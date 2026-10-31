@@ -1,6 +1,6 @@
 {
   "name": "vorqa",
-  "version": "0.1.0",
-  "description": "Developer preview of VORQA verification workflow discovery and read-only controller inspection for Codex.",
+  "version": "0.2.0-preview.1",
+  "description": "Developer preview of VORQA's explicit AVRL workflow for Codex using a pre-existing trusted controller.",
   "skills": "./skills/"
 }

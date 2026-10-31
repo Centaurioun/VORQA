@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "vorqa",
-  "version": "0.1.0",
-  "description": "Developer preview of VORQA verification workflow discovery and read-only controller inspection for Codex.",
+  "version": "0.2.0-preview.1",
+  "description": "Developer preview of VORQA's explicit AVRL workflow for Codex using a pre-existing trusted controller.",
   "author": {
     "name": "VORQA contributors"
   },
@@ -11,13 +11,14 @@
       "interface": {
         "displayName": "VORQA for Codex",
         "shortDescription": "Evidence-aware code QA",
-        "longDescription": "Inspect a VORQA-initialized repository and guide evidence-aware verification workflows. Preview: no automatic installation, native hook enforcement, or completion certification.",
+        "longDescription": "Explicitly guide staged verification through a pre-existing trusted AVRL controller, preserving human approval, independent review, QA evidence, and release gates. Native hook delivery remains unverified.",
         "developerName": "VORQA",
         "category": "Productivity",
         "capabilities": [
-          "Read"
+          "Read",
+          "Write"
         ],
-        "defaultPrompt": "Inspect the VORQA verification status for the current coding project, and explain any missing prerequisites."
+        "defaultPrompt": "Start explicit VORQA QA here; check prerequisites and report missing human or evidence gates."
       }
     }
   }
