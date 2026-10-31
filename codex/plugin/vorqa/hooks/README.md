@@ -4,10 +4,10 @@ Package: `vorqa` `0.2.0-alpha.1`. This directory is a **local-only feasibility e
 
 ## Architecture and safety
 
-The portable plugin defaults to `hooks/hooks.json` discovery. The hook configuration has two synchronous command handlers. Codex must independently discover and trust their exact definitions.
+The Codex compatibility manifest explicitly points to `./hooks/hooks.json`; Codex also supports the default `hooks/hooks.json` path when a manifest omits `hooks`. The first acceptance candidate registers one synchronous `UserPromptSubmit` handler. Codex must independently discover and trust that exact definition.
 
 - `UserPromptSubmit`: its native `matcher` is ignored, so `dispatcher.py` uses conservative deterministic selection in **already AVRL-initialized Git roots**; irrelevant prompts are silent. Qualified prompts cause a read-only `bridge.py probe`. Output is a fixed, short `additionalContext` message with `controller_present`, no raw prompt, workspace path, private controller state, claimed QA PASS or recorded human approval. This context is guidance to the model, not an automatic test/review execution or a security gate.
-- `Stop`: normally returns `{"continue":true}`. It **never blocks normal tasks**. In a disposable Git fixture only, an operator can set `VORQA_HOOK_STOP_PROBE=1` **and** create an ignored file `.avrl/hook-pilot-stop-fixture` containing exactly `VORQA_HOOK_PILOT_V1`. Only then does an initial Stop return `{"decision":"block",...}`; when `stop_hook_active` is true it does not ask to continue again. This exercises the host's continuation mechanism without claiming release gating.
+**Stop scope:** The dispatcher retains its `Stop` implementation and fixture tests, but `hooks.json` does not register `Stop` in this first candidate. No Stop continuation behavior is changed or included in this package.
 
 The hook subprocess never executes untrusted `scripts/avrl.py`; it only calls the already tested bridge `probe`, which checks controller file presence and Git root. Probe failure is silent, not success. No network, external API, MCP, telemetry upload, or persistent writes. The script intentionally fails open on malformed hook input; **it is not a security boundary**.
 
@@ -22,12 +22,11 @@ The hook subprocess never executes untrusted `scripts/avrl.py`; it only calls th
 
 - **Gate 1:** Without trusting the new hooks, verify they remain skipped and `0.1.0` stays unchanged.
 - **Gate 2:** After operator approval, verify real Codex host delivery of `UserPromptSubmit` once for an initialized fixture, with the expected bounded hook context and real read-only bridge `probe` evidence. Verify irrelevant/uninitialized prompts produce no VORQA context.
-- **Gate 3:** In a single disposable fixture, explicitly enable the Stop pilot environment and ignored marker, verify exactly one host continuation; ensure `stop_hook_active` prevents a loop. Remove marker/environment; repeat to verify zero continuation.
-- **Gate 4:** Report native observed hook events separately from Python fixture tests. No 10-case automatic-skill selection benchmark until the intended hook-driven workflow is defined and observed.
+- **Gate 3:** Report native observed `UserPromptSubmit` events separately from Python fixture tests. No 10-case automatic-skill selection benchmark until the intended hook-driven workflow is defined and observed.
 - **Rollback:** Disable/untrust only the candidate hooks through supported Codex UI, then return to pinned `0.1.0`; verify plugin inventory unchanged apart from the approved candidate. Never delete another installed plugin.
 
 ## Local tests
 
 `python3 -m unittest discover -s codex/plugin/vorqa/tests -v`
 
-This suite validates dispatcher output shape, privacy, routing, and one-shot Stop semantics. **It does not verify Codex hook discovery, trust, event delivery, or actual model behavior.** Native host evidence is required for those claims.
+This suite validates dispatcher output shape, privacy, routing, retained Stop guards, and the plugin manifest/event contract. **It does not verify Codex hook discovery, trust, event delivery, or actual model behavior.** Native host evidence is required for those claims.

@@ -35,7 +35,15 @@ class HookTests(unittest.TestCase):
         self.assertEqual(process.returncode, 0, process.stderr)
         return json.loads(process.stdout), process
 
-    def test_uninitialized_workspace_is_silent(self):
+    def test_unrelated_repo_has_no_context(self):
+        result, _ = self.run_hook("UserPromptSubmit", "Fix the validation regression")
+        self.assertEqual(result, {"continue": True})
+
+    def test_bridge_failure_does_not_inject_context(self):
+        self.initialized()
+        specs = self.root / "specs"
+        specs.rmdir()
+        specs.write_text("not a directory\n")
         result, _ = self.run_hook("UserPromptSubmit", "Fix the validation regression")
         self.assertEqual(result, {"continue": True})
 
@@ -73,6 +81,14 @@ class HookTests(unittest.TestCase):
         self.assertEqual(p.returncode, 0)
         self.assertEqual(json.loads(p.stdout), {"continue": True})
 
+    def test_dispatcher_emits_one_json_object(self):
+        data = {"hook_event_name": "UnknownEvent", "cwd": str(self.root)}
+        p = subprocess.run([sys.executable, str(HANDLER)], input=json.dumps(data),
+                           capture_output=True, text=True, timeout=15)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertEqual(len(p.stdout.splitlines()), 1)
+        self.assertEqual(json.loads(p.stdout), {"continue": True})
+
     def test_stop_default_is_advisory_only(self):
         self.initialized()
         result, _ = self.run_hook("Stop")
@@ -94,7 +110,7 @@ class HookTests(unittest.TestCase):
 
     def test_hook_config_is_bounded_and_not_asynchronous(self):
         hooks = json.loads((ROOT / "hooks/hooks.json").read_text())["hooks"]
-        self.assertEqual(set(hooks), {"UserPromptSubmit", "Stop"})
+        self.assertEqual(set(hooks), {"UserPromptSubmit"})
         for event in hooks:
             self.assertNotIn("matcher", hooks[event][0])
             handler = hooks[event][0]["hooks"][0]
