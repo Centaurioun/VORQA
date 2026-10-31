@@ -23,7 +23,7 @@ The hook subprocess never executes untrusted `scripts/avrl.py`; it only calls th
 - **Gate 1:** Without trusting the new hooks, verify they remain skipped and `0.1.0` stays unchanged.
 - **Gate 2:** After operator approval, verify real Codex host delivery of `UserPromptSubmit` once for an initialized fixture, with the expected bounded hook context and real read-only bridge `probe` evidence. Verify irrelevant/uninitialized prompts produce no VORQA context.
 - **Gate 3:** Report native observed `UserPromptSubmit` events separately from Python fixture tests. No 10-case automatic-skill selection benchmark until the intended hook-driven workflow is defined and observed.
-- **Rollback:** Disable/untrust only the candidate hooks through supported Codex UI, then return to pinned `0.1.0`; verify plugin inventory unchanged apart from the approved candidate. Never delete another installed plugin.
+- **Rollback status:** Codex can disable an individual candidate hook in `/hooks`, and plugin/marketplace removal can target the exact candidate identity. Those actions do not prove the candidate's `trusted_hash` was erased. No supported trust-record cleanup path is confirmed, so installation/trust acceptance remains blocked until that rollback behavior is documented and verifiable. Never remove or alter another installed plugin.
 
 ## Local tests
 
