@@ -27,7 +27,9 @@ class EvidenceTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
-        self.root = Path(self.tmp.name)
+        # macOS exposes temporary directories through both /var and /private/var.
+        # Keep the patched controller root canonical, matching avrl.py's ROOT.
+        self.root = Path(self.tmp.name).resolve()
         self.runtime = self.root / '.avrl'
         self.runtime.mkdir()
         self.state = {

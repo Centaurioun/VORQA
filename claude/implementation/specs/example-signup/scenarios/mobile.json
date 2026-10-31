@@ -30,7 +30,10 @@
       "value": "m@example.test"
     },
     {
-      "click": "#create"
+      "press": {
+        "selector": "#email",
+        "key": "Enter"
+      }
     },
     {
       "expect_text": "Account created"

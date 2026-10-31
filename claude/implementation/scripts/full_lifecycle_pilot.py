@@ -176,9 +176,15 @@ def pilot(mode: str):
         blocked=call(repo,hook,stdin=event,env=env)
         guards={'completed_stop_allowed':allowed.returncode==0,
                 'tampered_review_denied':blocked.returncode==2}
-        result=coverage(read(repo/'.avrl/trace.jsonl'),EXPECTED)
+        trace_records=read(repo/'.avrl/trace.jsonl')
+        result=coverage(trace_records,EXPECTED)
+        controller_state_events=[{key:record[key] for key in
+                                  ('event','action','from_status','to_status','round')
+                                  if key in record}
+                                 for record in trace_records if record.get('kind')=='state']
         passed=stages==STAGES and result['complete'] and all(guards.values())
         return {'status':'passed' if passed else 'failed','stages':stages,'coverage':result,
+                'controller_state_events':controller_state_events,
                 'guards':guards,'qa_mode':qa_mode,'native_claude_verified':False,
                 'operator_approval':'synthetic-pty-fixture',
                 'reviewer_identity':'synthetic-fixture','git_evidence':'disposable-repo'}

@@ -1,0 +1,101 @@
+{
+  "ci_artifact": {
+    "artifact_id": 13010299766,
+    "expires_at": "2026-11-06T20:54:15Z",
+    "name": "vorqa-observability-pilot",
+    "sha256": "1f935e4a98ead5c758dddda63b96e7deec231b25daffa140ac47166a60c96e61",
+    "url": "https://github.com/Centaurioun/VORQA/actions/runs/41126724426/artifacts/13010299766"
+  },
+  "excluded_artifacts": [
+    {
+      "location_category": ".avrl/qa-runs/<run-id>/logs/ (ignored local runtime)",
+      "reason": "Full raw output can contain local paths and execution context.",
+      "safe_summary": "Published per-test results, command statuses, failure chronology, environment summary.",
+      "type": "raw stdout/stderr logs and initial failed attempts"
+    },
+    {
+      "location_category": ".avrl/browser-evidence/example-signup/ (ignored local runtime)",
+      "reason": "Raw browser evidence is kept local under the privacy policy.",
+      "safe_summary": "Published scenario, viewport, visual-error, UI-result, and SHA-256 manifest entries.",
+      "type": "Playwright screenshots and visual comparison PNGs"
+    },
+    {
+      "location_category": ".avrl/browser-evidence/example-signup/diagnostics-*.json (ignored local runtime)",
+      "reason": "Contains raw error text and request URLs.",
+      "safe_summary": "Published counts and HTTP 5xx totals; all tested counts are zero.",
+      "type": "Detailed Playwright diagnostics JSON"
+    },
+    {
+      "location_category": ".avrl/qa-runs/<run-id>/ (ignored local runtime)",
+      "reason": "Local run metadata and synthetic event stream are retained privately.",
+      "safe_summary": "Published sanitized lifecycle, API, SQLite, hook, and state-event summaries.",
+      "type": "Raw pilot reports and synthetic trace"
+    },
+    {
+      "location_category": "not generated",
+      "reason": "The existing harness does not create Playwright trace archives.",
+      "safe_summary": "Scenario logs and screenshots are retained locally.",
+      "type": "Playwright traces"
+    },
+    {
+      "location_category": "not generated",
+      "reason": "Claude Code CLI is not installed; no native session occurred.",
+      "safe_summary": "Native host is explicitly marked UNVERIFIED.",
+      "type": "Native Claude session logs"
+    }
+  ],
+  "published_files": [
+    {
+      "bytes": 4260,
+      "path": "README.md",
+      "sha256": "be7b3ba287fcbc80ad7ce81169b91b5d5b9ab818b6467c669a4ffd84e16f5960"
+    },
+    {
+      "bytes": 1289,
+      "path": "browser-report.md",
+      "sha256": "d0a26a47a5ff0d350a166be2ae30ff233e1eb2eee91c16bc18289ef495e2e6fd"
+    },
+    {
+      "bytes": 11199,
+      "path": "commands.jsonl",
+      "sha256": "6da7f12ad038cba057223b26cdb5451956e6b51e44d0fa71e663f1e4197b4b3b"
+    },
+    {
+      "bytes": 2361,
+      "path": "coverage.json",
+      "sha256": "8073e5a44155a1d4e9878ba549d04d677a13db7f77e1ae0b9458853ac2cac1ac"
+    },
+    {
+      "bytes": 1228,
+      "path": "environment.md",
+      "sha256": "b74c505489d31b84afb16d49a04ed34bedb61992d779bf42649554a34d4e90f3"
+    },
+    {
+      "bytes": 2190,
+      "path": "failures.md",
+      "sha256": "7da58baa05d95aae4688294a62209b3fdbb43a9e1023606526ec6fd777f588f8"
+    },
+    {
+      "bytes": 4447,
+      "path": "hook-matrix.md",
+      "sha256": "5036772772dd83fd6e3796fa4707137d1788650f6978a49c0667851693c04992"
+    },
+    {
+      "bytes": 1310,
+      "path": "lifecycle-report.md",
+      "sha256": "a0495d15c8c378834513385133c6f04404e1dd3909adad851916c08b71967a81"
+    },
+    {
+      "bytes": 17236,
+      "path": "sanitized-results.json",
+      "sha256": "883626357a7ca99cb07762bb6c51701d7991322edb6b88411ff2234306d6dacb"
+    },
+    {
+      "bytes": 7637,
+      "path": "test-matrix.md",
+      "sha256": "eb4c3e6e8874f1da14795e548fc2fc641558a45f600ee0cf6a36ea2dc4253b40"
+    }
+  ],
+  "run_id": "20261030T204942255262Z-234f24d6d2",
+  "tested_git_sha": "234f24d6d2a7ab08852c633234abd10d551772c3"
+}
